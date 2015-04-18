@@ -5,5 +5,47 @@
 html,
 body {
   height: 100%;
-  background-color: #777;
+  /*background-color: #777;*/
+}
+
+/* line 12, ../sass/elf.scss */
+#content {
+  padding-top: 70px;
+}
+
+/* Navigation */
+/* line 17, ../sass/elf.scss */
+.navbar .active {
+  font-weight: bold;
+}
+
+/* Einsatztagebuch */
+/* line 22, ../sass/elf.scss */
+#new input {
+  width: 100%;
+}
+
+/* line 26, ../sass/elf.scss */
+th.table-timestamp {
+  width: 14%;
+}
+
+/* line 30, ../sass/elf.scss */
+th.table-unit {
+  width: 13%;
+}
+
+/* line 34, ../sass/elf.scss */
+th.table-message {
+  width: 45%;
+}
+
+/* line 38, ../sass/elf.scss */
+th.table-person {
+  width: 13%;
+}
+
+/* line 42, ../sass/elf.scss */
+th.table-icons {
+  width: 2%;
 }

@@ -1,18 +1,18 @@
 package server
 
 type Hub struct {
-	Connections map[*connection]bool
-	Broadcast   chan []byte
-	Register    chan *connection
-	Unregister  chan *connection
+	Connections map[*Connection]bool
+	Broadcast   chan *Message
+	Register    chan *Connection
+	Unregister  chan *Connection
 }
 
 func NewHub() *Hub {
 	return &Hub{
-		Connections: make(map[*connection]boot),
-		Broadcast:   make(chan []byte),
-		Register:    make(chan *connection),
-		Unregister:  make(chan *connection),
+		Connections: make(map[*Connection]bool),
+		Broadcast:   make(chan *Message),
+		Register:    make(chan *Connection),
+		Unregister:  make(chan *Connection),
 	}
 }
 
