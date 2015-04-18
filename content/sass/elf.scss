@@ -42,3 +42,7 @@ th.table-person {
 th.table-icons {
 	width: 2%;
 }
+
+td > ul.typeahead {
+	cursor: pointer;
+}

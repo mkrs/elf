@@ -49,3 +49,8 @@ th.table-person {
 th.table-icons {
   width: 2%;
 }
+
+/* line 46, ../sass/elf.scss */
+td > ul.typeahead {
+  cursor: pointer;
+}
