@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="elf">
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,8 +10,17 @@
 	<script src="/js/jquery-2.1.3.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="/js/jquery-dateFormat.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="/js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/js/angular.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/js/angular-route.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/js/angular-strap.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/js/angular-strap.tpl.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/js/parse-options.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/js/typeahead.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/js/typeahead.tpl.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/js/angular-websocket.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/js/app.js" type="text/javascript" charset="utf-8"></script>
 </head>
-<body ng-app="elf" ng-controller="ElfController">
+<body>
 <!-- Navigation -->
 <nav class="navbar navbar-default navbar-fixed-top">
   <div class="container-fluid">
@@ -25,8 +34,8 @@
     </div>
     <div class="collapse navbar-collapse" id="nav-collapse">
       <ul class="nav navbar-nav">
-        <li ng-class="{active:mode==1}"><a href="#" ng-click="mode=1">Einsatztagebuch</a></li>
-        <li ng-class="{active:mode==2}"><a href="#" ng-click="mode=2">Eingesetzte Kr&auml;fte</a></li>
+        <li ng-class="{active:mode==1}"><a href="#/etb" ng-click="mode=1">Einsatztagebuch</a></li>
+        <li ng-class="{active:mode==2}"><a href="#/kraefte" ng-click="mode=2">Eingesetzte Kr&auml;fte</a></li>
       </ul>
     </div>
   </div>
@@ -34,121 +43,7 @@
 <!-- /Navigation -->
 
 <!-- Content -->
-<div id="content">
-	<!-- Einsatztagebuch -->
-	<section id="einsatztagebuch" class="container-fluid" ng-show="mode == 1">
-		<table class="table table-condensed">
-			<thead>
-				<tr>
-					<th class="table-timestamp">Datum / Zeit</th>
-					<th class="table-unit">An</th>
-					<th class="table-unit">Von</th>
-					<th class="table-message">Nachricht</th>
-					<th class="table-person">Bearbeiter</th>
-					<th class="table-icons"></th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr id="new">
-					<td>{{ newEntry.ts | date:"dd.MM.yyyy HH:mm:ss" }}</td>
-					<td><input class="form-control" ng-model="newEntry.to" type="text" placeholder="An" bs-options="unit for unit in units" bs-typeahead></td>
-					<td><input class="form-control" ng-model="newEntry.from" type="text" placeholder="Von" bs-options="unit for unit in units" bs-typeahead></td>
-					<td><input class="form-control" ng-model="newEntry.msg" type="text" placeholder="Nachricht"></td>
-					<td><input class="form-control" ng-model="newEntry.usr" type="text" placeholder="Bearbeiter"></td>
-					<td><button ng-click="addNewEtbEntry()" class="btn btn-success"><span class="glyphicon glyphicon-ok"></span></button></td>
-				</tr>
-				<tr ng-repeat="e in etb track by $index">
-					<td>{{ e.ts | date:"dd.MM.yyyy HH:mm" }}</td>
-					<td ng-hide="e.edit">{{ e.to }}</td>
-					<td ng-show="e.edit"><input class="form-control" ng-model="e.to" type="text" placeholder="An" bs-options="unit for unit in units" bs-typeahead></td>
-					<td ng-hide="e.edit">{{ e.from }}</td>
-					<td ng-show="e.edit"><input class="form-control" ng-model="e.from" type="text" placeholder="Von" bs-options="unit for unit in units" bs-typeahead></td>
-					<td ng-hide="e.edit">{{ e.msg }}</td>
-					<td ng-show="e.edit"><input class="form-control" ng-model="e.msg" type="text" placeholder="Nachricht"></td>
-					<td ng-hide="e.edit">{{ e.usr }}</td>
-					<td ng-show="e.edit"><input class="form-control" ng-model="e.usr" type="text" placeholder="Bearbeiter"></td>
-					<td ng-hide="e.edit"><button ng-click="editEtbEntry($index)" class="btn btn-warning"><span class="button glyphicon glyphicon-pencil"></span></button></td>
-					<td ng-show="e.edit"><button ng-click="saveEtbEntry($index)" class="btn btn-success"><span class="button glyphicon glyphicon-ok"></span></button></td>
-				</tr>
-			</tbody>
-		</table>
-	</section>
-	<!-- /Einsatztagebuch -->
-
-	<!-- Eingesetzte Kräfte -->
-	<section id="eingesetztekraefte" class="container-fluid" ng-show="mode == 2">
-
-	</section>
-	<!-- /Eingesetzte Kräfte -->
-</div>
+<div id="content" class="ng-view"></div>
 <!-- /Content -->
-
-<!-- AngularJS -->
-<script src="/js/angular.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/js/angular-strap.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/js/angular-strap.tpl.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/js/parse-options.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/js/typeahead.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="/js/typeahead.tpl.js" type="text/javascript" charset="utf-8"></script>
-<script type="text/javascript" charset="utf-8">
-	var app = angular.module('elf', ["mgcrea.ngStrap.typeahead"]);
-	app.controller('ElfController', function($scope) {
-		var defaultEntry = {
-	    	to: "",
-	    	from: "",
-	    	msg: "",
-	    	usr: "",
-	    	edit: false
-	    };
-		var now = new Date();
-		$scope.mode = 1;
-	   $scope.etb = [
-	   	{ts:new Date().setUTCMilliseconds(now.getUTCMilliseconds() - 360000), to:"Pumpe Zellerndorf", from:"EL", msg:"Wasser Marsch!", usr:"LM Schwayer"},
-	    	{ts:new Date().setUTCMilliseconds(now.getUTCMilliseconds() - 480000), to:"EL", from:"Pumpe Zellerndorf", msg:"Zubringleitung fertig", usr:"LM Schwayer"}
-	   ];
-	   $scope.newEntry = $.extend({ts:new Date()}, defaultEntry);
-	   $scope.newEntry.usr = "LM Schwayer";
-	   $scope.units = ["EL","Pumpe Zellerndorf"];
-
-	   setInterval(function(){
-			$scope.$apply(function(){
-				$scope.newEntry.ts = new Date();
-			});
-		},1000);
-
-	   $scope.addNewEtbEntry = function() {
-	   	if ($scope.newEntry.to == "") {
-	   		alert("Feld 'An' ist leer.");
-	   		return;
-	   	}
-	   	if ($scope.newEntry.from == "") {
-	   		alert("Feld 'Von' ist leer.");
-	   		return;
-	   	}
-	   	if ($scope.newEntry.msg == "") {
-	   		alert("Feld 'Nachricht' ist leer.");
-	   		return;
-	   	}
-	   	if ($scope.newEntry.usr == "") {
-	   		alert("Feld 'Bearbeiter' ist leer.");
-	   		return;
-	   	}
-	   	var user = $scope.newEntry.usr;
-	   	$scope.etb.unshift($scope.newEntry);
-	   	$scope.newEntry = $.extend({ts:new Date()}, defaultEntry, {usr:user});
-	   	// TODO: Send 'new entry' message to server
-	   };
-
-	   $scope.editEtbEntry = function(i) {
-	   	$scope.etb[i].edit = true;
-	   }
-
-	   $scope.saveEtbEntry = function(i) {
-	   	$scope.etb[i].edit = false;
-	   	// TODO: Send 'save entry' message to server
-	   }
-	});
-</script>
-<!-- /AngularJS -->
 </body>
 </html>

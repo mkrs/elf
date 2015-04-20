@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	if err := server.ListenAndServe("/Users/mkrs/go/src/github.com/mkrs/elf/content"); err != nil {
+	if err := server.ListenAndServe("."); err != nil {
 		l.Logln("Error serving.", err)
 	}
 	l.Logln("Finished.")

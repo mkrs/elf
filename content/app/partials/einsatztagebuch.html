@@ -1,0 +1,38 @@
+<!-- Einsatztagebuch -->
+<section class="container-fluid">
+	<table class="table table-condensed">
+		<thead>
+			<tr>
+				<th class="table-timestamp">Datum / Zeit</th>
+				<th class="table-unit">An</th>
+				<th class="table-unit">Von</th>
+				<th class="table-message">Nachricht</th>
+				<th class="table-person">Bearbeiter</th>
+				<th class="table-icons"></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr id="new">
+				<td>{{ newEntry.ts | date:"dd.MM.yyyy HH:mm:ss" }}</td>
+				<td><input class="form-control" ng-model="newEntry.to" type="text" placeholder="An" bs-options="unit for unit in ElfData.units" bs-typeahead></td>
+				<td><input class="form-control" ng-model="newEntry.from" type="text" placeholder="Von" bs-options="unit for unit in ElfData.units" bs-typeahead></td>
+				<td><input class="form-control" ng-model="newEntry.msg" type="text" placeholder="Nachricht"></td>
+				<td><input class="form-control" ng-model="newEntry.usr" type="text" placeholder="Bearbeiter"></td>
+				<td><button ng-click="addNewEtbEntry()" class="btn btn-success"><span class="glyphicon glyphicon-ok"></span></button></td>
+			</tr>
+			<tr ng-repeat="e in ElfData.etb track by $index">
+				<td>{{ e.ts | date:"dd.MM.yyyy HH:mm" }}</td>
+				<td ng-hide="e.edit">{{ e.to }}</td>
+				<td ng-show="e.edit"><input class="form-control" ng-model="e.to" type="text" placeholder="An" bs-options="unit for unit in ElfData.units" bs-typeahead></td>
+				<td ng-hide="e.edit">{{ e.from }}</td>
+				<td ng-show="e.edit"><input class="form-control" ng-model="e.from" type="text" placeholder="Von" bs-options="unit for unit in ElfData.units" bs-typeahead></td>
+				<td ng-hide="e.edit">{{ e.msg }}</td>
+				<td ng-show="e.edit"><input class="form-control" ng-model="e.msg" type="text" placeholder="Nachricht"></td>
+				<td ng-hide="e.edit">{{ e.usr }}</td>
+				<td ng-show="e.edit"><input class="form-control" ng-model="e.usr" type="text" placeholder="Bearbeiter"></td>
+				<td ng-hide="e.edit"><button ng-click="editEtbEntry($index)" class="btn btn-warning"><span class="button glyphicon glyphicon-pencil"></span></button></td>
+				<td ng-show="e.edit"><button ng-click="saveEtbEntry($index)" class="btn btn-success"><span class="button glyphicon glyphicon-ok"></span></button></td>
+			</tr>
+		</tbody>
+	</table>
+</section>
