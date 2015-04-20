@@ -5,9 +5,9 @@ import (
 )
 
 type Mitglied struct {
-	Dienstgrad string `json:dienstgrad`
-	Name       string `json:name`
-	Vorname    string `json:vorname`
+	Dienstgrad string `json:"dienstgrad"`
+	Name       string `json:"name"`
+	Vorname    string `json:"vorname"`
 }
 
 func NewMitglied(dgr, name, first string) *Mitglied {
@@ -19,11 +19,11 @@ func NewMitglied(dgr, name, first string) *Mitglied {
 }
 
 type TagebuchEintrag struct {
-	Timestamp  time.Time `json:timestamp`
-	An         string    `json:an`
-	Von        string    `json:von`
-	Inhalt     string    `json:inhalt`
-	Bearbeiter *Mitglied `json:bearbeiter`
+	Timestamp  time.Time `json:"timestamp"`
+	An         string    `json:"an"`
+	Von        string    `json:"von"`
+	Inhalt     string    `json:"inhalt"`
+	Bearbeiter *Mitglied `json:"bearbeiter"`
 }
 
 func NewTagebuchEintrag(an, von, inhalt string, bearbeiter *Mitglied) *TagebuchEintrag {

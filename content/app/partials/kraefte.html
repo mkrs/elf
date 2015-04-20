@@ -1,4 +1,81 @@
 <!-- Eingesetzte Kräfte -->
 <section id="eingesetztekraefte" class="container-fluid" ng-show="mode == 2">
-	<h1>Das ist die View f&uuml;r eingesetzte Kr&auml;fte.</h1>
+	<div class="row">
+		<div class="col-md-9">
+			<table class="table table-condensed">
+				<thead>
+					<tr>
+						<th class="table-timestamp">Kommt</th>
+						<th class="table-timestamp">Geht</th>
+						<th class="table-unit">Feuerwehr</th>
+						<th class="table-unit">Fahrzeug</th>
+						<th>Mitglieder</th>
+						<th>ATS Geräte</th>
+						<th>ATS Träger</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="k in ElfData.ek | orderObjectBy:'from':true">
+						<td>{{ k.from | date:"dd.MM.yyyy HH:mm:ss" }}</td>
+						<td>{{ k.to | date:"dd.MM.yyyy HH:mm:ss" }}</td>
+						<td>{{ k.fw }}</td>
+						<td>{{ k.fzg }}</td>
+						<td>{{ k.ppl }}</td>
+						<td>{{ k.atsg }}</td>
+						<td>{{ k.atst }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="col-md-3">
+			<h3>Summen (AKTUELL)</h3>
+			<table class="table table-condensed">
+				<tr>
+					<th>Feuerwehren</th>
+					<td>{{ actSums.fw }}</td>
+				</tr>
+				<tr>
+					<th>Fahrzeuge</th>
+					<td>{{ actSums.fzg }}</td>
+				</tr>
+				<tr>
+					<th>Mannschaftsstand</th>
+					<td>{{ actSums.ppl }}</td>
+				</tr>
+				<tr>
+					<th>ATS Ger&auml;te</th>
+					<td>{{ actSums.atsg }}</td>
+				</tr>
+				<tr>
+					<th>ATS Ger&auml;tetr&auml;ger</th>
+					<td>{{ actSums.atst }}</td>
+				</tr>
+			</table>
+
+			<h3>Summen (GESAMT)</h3>
+			<table class="table table-condensed">
+				<tr>
+					<th>Feuerwehren</th>
+					<td>{{ allSums.fw }}</td>
+				</tr>
+				<tr>
+					<th>Fahrzeuge</th>
+					<td>{{ allSums.fzg }}</td>
+				</tr>
+				<tr>
+					<th>Mannschaftsstand</th>
+					<td>{{ allSums.ppl }}</td>
+				</tr>
+				<tr>
+					<th>ATS Ger&auml;te</th>
+					<td>{{ allSums.atsg }}</td>
+				</tr>
+				<tr>
+					<th>ATS Ger&auml;tetr&auml;ger</th>
+					<td>{{ allSums.atst }}</td>
+				</tr>
+			</table>
+		</div>
+	</div>
 </section>
