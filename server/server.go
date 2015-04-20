@@ -1,27 +1,46 @@
 package server
 
 import (
+	"fmt"
+	"github.com/gorilla/websocket"
 	l "github.com/mkrs/elf/log"
 	"net/http"
 )
 
 func ListenAndServe(rootpath string) error {
+	// Messaging Hub
+	hub := NewHub()
+	go hub.Run()
 	// Static File Handler
-	l.Logln(rootpath)
 	http.Handle("/", http.FileServer(http.Dir(rootpath)))
 	// Websocket Handler
-	http.Handle("/ws", newWsHandler())
+	http.Handle("/ws", newWsHandler(hub))
 	// Start Serving
-	return http.ListenAndServe("localhost:1122", nil)
+	l.Logln(fmt.Sprintf("Start serving path '%s' ...", rootpath))
+	return http.ListenAndServe(":1122", nil)
 }
 
 type wsHandler struct {
+	*Hub
 }
 
-func newWsHandler() *wsHandler {
-	return &wsHandler{}
+func newWsHandler(hub *Hub) *wsHandler {
+	return &wsHandler{Hub: hub}
 }
 
 func (h *wsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	l.Logln("Got request", *r)
+	c, err := NewConnection(w, r, h.Hub)
+	if _, ok := err.(websocket.HandshakeError); ok {
+		http.Error(w, "Not a websocket handshake", 400)
+		l.Logln("Not a websocket handshake 400")
+		return
+	} else if err != nil {
+		l.Logln("Could not create connection:", err)
+		return
+	}
 
+	h.Register <- c
+	go c.Writer()
+	c.Reader()
 }

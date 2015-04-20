@@ -22,7 +22,8 @@ app.config(["$routeProvider", function($routeProvider) {
 
 /* Websocket */
 app.factory("ElfData", function($websocket) {
-	//var ws = $websocket("ws://localhost:1122/ws");
+	var url = "ws://" + window.location.host + "/ws";
+	var ws = $websocket(url);
 	var now = new Date();
 	var elfData = {
 		etb: [
@@ -35,9 +36,20 @@ app.factory("ElfData", function($websocket) {
 			"Pumpe Zellerndorf"
 		],
 		newEtbEntry: function(e) {
-			this.etb.unshift(e);
+			ws.send({typ:"new-etb", data:e});
 		}
 	};
+
+	ws.onMessage(function(message){
+		var msg = JSON.parse(message.data);
+		if ((msg.typ === undefined) ||
+		    (msg.data === undefined)) {
+			return;
+		}
+		if (msg.typ == "new-etb") {
+			elfData.etb.unshift(msg.data);
+		}
+	});
 
 	return elfData;
 });
@@ -54,7 +66,7 @@ app.controller('ElfEtbController', ["$scope", "ElfData", function($scope, ElfDat
     	usr: "",
     	edit: false
     };
-    
+
 	var now = new Date();
 	$scope.newEntry = $.extend({ts:new Date()}, defaultEntry);
 	$scope.newEntry.usr = "LM Schwayer";
