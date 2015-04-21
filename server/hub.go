@@ -23,10 +23,10 @@ func (h *Hub) Run() {
 		select {
 		case c := <-h.Register:
 			h.Connections[c] = true
+			h.initConnectionWithData(c)
 		case c := <-h.Unregister:
 			if _, ok := h.Connections[c]; ok {
-				delete(h.Connections, c)
-				close(c.Send)
+				h.endConnection(c)
 			}
 		case m := <-h.Broadcast:
 			h.broadcast(m, nil)
@@ -34,6 +34,11 @@ func (h *Hub) Run() {
 			h.broadcast(u.msg, u.c)
 		}
 	}
+}
+
+func (h *Hub) endConnection(c *Connection) {
+	delete(h.Connections, c)
+	close(c.Send)
 }
 
 func (h *Hub) broadcast(m *Message, conn *Connection) {
@@ -44,8 +49,18 @@ func (h *Hub) broadcast(m *Message, conn *Connection) {
 		select {
 		case c.Send <- m:
 		default:
-			delete(h.Connections, c)
-			close(c.Send)
+			h.endConnection(c)
 		}
+	}
+}
+
+func (h *Hub) initConnectionWithData(c *Connection) {
+	etb := demoProject.GetTagebuch()
+	for _, tb := range etb {
+		c.Send <- NewTagebuchMessage(tb)
+	}
+	ek := demoProject.GetEinheiten()
+	for _, k := range ek {
+		c.Send <- NewEinheitMessage(k)
 	}
 }

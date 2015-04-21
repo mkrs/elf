@@ -27,12 +27,6 @@ app.factory("ElfData", function($websocket) {
 	var now = new Date();
 	var nowMsec = now.getUTCMilliseconds();
 	var elfData = {
-		_id: 0,
-		newId: function() {
-			this._id %= 1000000;
-			this._id += 1;
-			return this._id;
-		},
 		etb: {},
 		ek: {},
 		units: [
@@ -45,34 +39,10 @@ app.factory("ElfData", function($websocket) {
 		},
 		updateEtbEntry: function(e) {
 			ws.send({typ:"update-etb", data:e});
+		},
+		updateEkEntry: function(e) {
+			ws.send({typ:"update-ek", data:e});
 		}
-	};
-
-	var id = elfData.newId();
-	elfData.etb[id] = {id:id, ts:new Date().setUTCMilliseconds(nowMsec - 360000), to:"Pumpe Zellerndorf", from:"EL", msg:"Wasser Marsch!", usr:"LM Schwayer"};
-	id = elfData.newId();
-	elfData.etb[id] = {id:id, ts:new Date().setUTCMilliseconds(nowMsec - 480000), to:"EL", from:"Pumpe Zellerndorf", msg:"Zubringleitung fertig", usr:"LM Schwayer"}
-	id = elfData.newId();
-	elfData.ek[id] = {
-		id:id,
-		from:new Date().setUTCMilliseconds(nowMsec - 360000),
-		to:new Date().setUTCMilliseconds(nowMsec - 240000),
-		fw:"Zellerndorf",
-		fzg:"Pumpe",
-		ppl:9,
-		atsg:0,
-		atst:5
-	};
-	id = elfData.newId();
-	elfData.ek[id] = {
-		id:id,
-		from:new Date().setUTCMilliseconds(nowMsec - 480000),
-		to:null,
-		fw:"Zellerndorf",
-		fzg:"Tank",
-		ppl:9,
-		atsg:3,
-		atst:6
 	};
 
 	ws.onMessage(function(message){
@@ -81,10 +51,16 @@ app.factory("ElfData", function($websocket) {
 		    (msg.data === undefined)) {
 			return;
 		}
-		if (msg.typ == "new-etb") {
-			elfData.etb[msg.data.id] = msg.data;
-		} else if (msg.typ == "update-etb") {
-			elfData.etb[msg.data.id] = msg.data;
+		var t = msg.typ;
+		var id = msg.data.id;
+		if (t == "new-etb") {
+			elfData.etb[id] = msg.data;
+		} else if (t == "update-etb") {
+			elfData.etb[id] = msg.data;
+		} else if (t == "init-etb") {
+			elfData.etb[id] = msg.data;
+		} else if (t == "init-ek") {
+			elfData.ek[id] = msg.data;
 		}
 	});
 
@@ -124,7 +100,7 @@ app.controller('ElfEtbController', ["$scope", "ElfData", function($scope, ElfDat
     };
 
 	var now = new Date();
-	$scope.newEntry = angular.extend({id:ElfData.newId(), ts:new Date()}, defaultEntry);
+	$scope.newEntry = angular.extend({}, defaultEntry, {ts:new Date()});
 	$scope.newEntry.usr = "LM Schwayer";
 	$scope.ElfData = ElfData;
 	$scope.etbBefore = {};
@@ -154,11 +130,11 @@ app.controller('ElfEtbController', ["$scope", "ElfData", function($scope, ElfDat
 		}
 		var user = $scope.newEntry.usr;
 		$scope.ElfData.newEtbEntry($scope.newEntry);
-		$scope.newEntry = angular.extend({id:$scope.ElfData.newId(), ts:new Date()}, defaultEntry, {usr:user});
+		$scope.newEntry = angular.extend({}, defaultEntry, {ts:new Date(), usr:user});
 	};
 
 	$scope.editEtbEntry = function(e) {
-		$scope.etbBefore[e.id] = angular.extend({},e);
+		$scope.etbBefore[e.id] = angular.copy(e);
 		//$scope.ElfData.etb[i].edit = true;
 		e.edit = true;
 	}
@@ -229,6 +205,11 @@ app.controller("ElfKraefteController", ["$scope", "ElfData", function($scope, El
 	$scope.$watch(function(scope){ return scope.ElfData; }, function(newValue, oldValue){
 		$scope.calculateSums();
 	});
+
+	$scope.einheitLeaves = function(e) {
+		var newE = angular.extend({}, e, {to:new Date()});
+		$scope.ElfData.updateEkEntry(newE);
+	}
 }]);
 
 

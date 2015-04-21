@@ -3,11 +3,16 @@ package server
 import (
 	"fmt"
 	"github.com/gorilla/websocket"
+	d "github.com/mkrs/elf/data"
 	l "github.com/mkrs/elf/log"
 	"net/http"
 )
 
+var demoProject *d.Project = nil
+
 func ListenAndServe(rootpath string) error {
+	// Demo Project
+	demoProject = d.NewDemoProject("Demo")
 	// Messaging Hub
 	hub := NewHub()
 	go hub.Run()
@@ -29,7 +34,7 @@ func newWsHandler(hub *Hub) *wsHandler {
 }
 
 func (h *wsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	l.Logln("Got request", *r)
+	//l.Logln("Got request", *r)
 	c, err := NewConnection(w, r, h.Hub)
 	if _, ok := err.(websocket.HandshakeError); ok {
 		http.Error(w, "Not a websocket handshake", 400)

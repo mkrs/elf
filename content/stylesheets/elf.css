@@ -51,6 +51,13 @@ th.table-icons {
 }
 
 /* line 46, ../sass/elf.scss */
+th.table-min,
+td.table-min {
+  width: 1%;
+  white-space: nowrap;
+}
+
+/* line 51, ../sass/elf.scss */
 td > ul.typeahead {
   cursor: pointer;
 }

@@ -2,22 +2,31 @@
 <section id="eingesetztekraefte" class="container-fluid" ng-show="mode == 2">
 	<div class="row">
 		<div class="col-md-9">
-			<table class="table table-condensed">
+			<table id="kraefte" class="table table-condensed">
 				<thead>
 					<tr>
-						<th class="table-timestamp">Kommt</th>
-						<th class="table-timestamp">Geht</th>
-						<th class="table-unit">Feuerwehr</th>
-						<th class="table-unit">Fahrzeug</th>
-						<th>Mitglieder</th>
-						<th>ATS Geräte</th>
-						<th>ATS Träger</th>
+						<th class="table-min">Kommt</th>
+						<th class="table-min">Geht</th>
+						<th>Feuerwehr</th>
+						<th>Fahrzeug</th>
+						<th class="table-min">Mitglieder</th>
+						<th class="table-min">ATS Geräte</th>
+						<th class="table-min">ATS Träger</th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr ng-repeat="k in ElfData.ek | orderObjectBy:'from':true">
-						<td>{{ k.from | date:"dd.MM.yyyy HH:mm:ss" }}</td>
-						<td>{{ k.to | date:"dd.MM.yyyy HH:mm:ss" }}</td>
+					<tr ng-repeat="k in ElfData.ek | orderObjectBy:'from':true" ng-if="k.to===null">
+						<td class="table-min">{{ k.from | date:"dd.MM.yyyy HH:mm" }}</td>
+						<td class="table-min"><button ng-click="einheitLeaves(k)" class="btn btn-danger"><span class="glyphicon glyphicon-log-out"></span></button></td>
+						<td>{{ k.fw }}</td>
+						<td>{{ k.fzg }}</td>
+						<td>{{ k.ppl }}</td>
+						<td>{{ k.atsg }}</td>
+						<td>{{ k.atst }}</td>
+					</tr>
+					<tr ng-repeat="k in ElfData.ek | orderObjectBy:'from':true" ng-if="k.to!==null">
+						<td class="table-min">{{ k.from | date:"dd.MM.yyyy HH:mm" }}</td>
+						<td class="table-min">{{ k.to | date:"dd.MM.yyyy HH:mm" }}</td>
 						<td>{{ k.fw }}</td>
 						<td>{{ k.fzg }}</td>
 						<td>{{ k.ppl }}</td>

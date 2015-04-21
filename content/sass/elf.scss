@@ -43,6 +43,12 @@ th.table-icons {
 	width: 2%;
 }
 
+th.table-min,
+td.table-min {
+	width: 1%;
+	white-space:nowrap;
+}
+
 td > ul.typeahead {
 	cursor: pointer;
 }
