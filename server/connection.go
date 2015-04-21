@@ -17,6 +17,7 @@ type Connection struct {
 type Message struct {
 	Typ  string `json:"typ"`
 	Data struct {
+		Id   int       `json:"id"`
 		Ts   time.Time `json:"ts"`
 		To   string    `json:"to"`
 		From string    `json:"from"`
@@ -24,6 +25,11 @@ type Message struct {
 		Usr  string    `json:"usr"`
 		Edit bool      `json:"edit"`
 	} `json:"data"`
+}
+
+type UpdateMessage struct {
+	c   *Connection
+	msg *Message
 }
 
 var upgrader = websocket.Upgrader{
@@ -37,11 +43,13 @@ func NewConnection(w http.ResponseWriter, r *http.Request, h *Hub) (*Connection,
 		return nil, err
 	}
 
-	return &Connection{
+	c := &Connection{
 		Sock: conn,
 		Send: make(chan *Message),
 		Hub:  h,
-	}, nil
+	}
+
+	return c, nil
 }
 
 func (c *Connection) Reader() {
@@ -51,15 +59,8 @@ func (c *Connection) Reader() {
 			break
 		}
 		// Nachricht verarbeiten
-		l.Logln(string(msgBytes))
-		msg := new(Message)
-		//var v interface{}
-		if err := json.Unmarshal(msgBytes, msg); err != nil {
-			l.Logln("Error unmarshalling", err)
-			continue
-		}
-		l.Logln(*msg)
-		c.Broadcast <- msg
+		//l.Logln(string(msgBytes))
+		c.handleMessage(msgBytes)
 	}
 	c.Sock.Close()
 }
@@ -75,4 +76,28 @@ func (c *Connection) Writer() {
 		}
 	}
 	c.Sock.Close()
+}
+
+func (c *Connection) handleMessage(bs []byte) {
+	msg := &Message{}
+	//var v interface{}
+	if err := json.Unmarshal(bs, &msg); err != nil {
+		l.Logln("Error unmarshalling", err)
+		return
+	}
+	l.Logln(msg)
+
+	switch msg.Typ {
+	case "dump-etb":
+		// TODO
+	case "dump-ek":
+		// TODO
+	case "new-etb":
+		// TODO: save data
+		c.Broadcast <- msg
+	case "update-etb":
+		// TODO: save data
+		c.Update <- &UpdateMessage{c: c, msg: msg}
+	}
+
 }

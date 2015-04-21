@@ -25,31 +25,16 @@ app.factory("ElfData", function($websocket) {
 	var url = "ws://" + window.location.host + "/ws";
 	var ws = $websocket(url);
 	var now = new Date();
+	var nowMsec = now.getUTCMilliseconds();
 	var elfData = {
-		etb: [
-			{ts:new Date().setUTCMilliseconds(now.getUTCMilliseconds() - 360000), to:"Pumpe Zellerndorf", from:"EL", msg:"Wasser Marsch!", usr:"LM Schwayer"},
-			{ts:new Date().setUTCMilliseconds(now.getUTCMilliseconds() - 480000), to:"EL", from:"Pumpe Zellerndorf", msg:"Zubringleitung fertig", usr:"LM Schwayer"}
-		],
-		ek: {
-			"Zellerndorf-Pumpe":{
-				from:new Date().setUTCMilliseconds(now.getUTCMilliseconds() - 360000),
-				to:new Date().setUTCMilliseconds(now.getUTCMilliseconds() - 240000),
-				fw:"Zellerndorf",
-				fzg:"Pumpe",
-				ppl:9,
-				atsg:0,
-				atst:5
-			},
-			"Zellerndorf-Tank":{
-				from:new Date().setUTCMilliseconds(now.getUTCMilliseconds() - 480000),
-				to:null,
-				fw:"Zellerndorf",
-				fzg:"Tank",
-				ppl:9,
-				atsg:3,
-				atst:6
-			}
+		_id: 0,
+		newId: function() {
+			this._id %= 1000000;
+			this._id += 1;
+			return this._id;
 		},
+		etb: {},
+		ek: {},
 		units: [
 			"EL",
 			"Pumpe Zellerndorf",
@@ -57,7 +42,37 @@ app.factory("ElfData", function($websocket) {
 		],
 		newEtbEntry: function(e) {
 			ws.send({typ:"new-etb", data:e});
+		},
+		updateEtbEntry: function(e) {
+			ws.send({typ:"update-etb", data:e});
 		}
+	};
+
+	var id = elfData.newId();
+	elfData.etb[id] = {id:id, ts:new Date().setUTCMilliseconds(nowMsec - 360000), to:"Pumpe Zellerndorf", from:"EL", msg:"Wasser Marsch!", usr:"LM Schwayer"};
+	id = elfData.newId();
+	elfData.etb[id] = {id:id, ts:new Date().setUTCMilliseconds(nowMsec - 480000), to:"EL", from:"Pumpe Zellerndorf", msg:"Zubringleitung fertig", usr:"LM Schwayer"}
+	id = elfData.newId();
+	elfData.ek[id] = {
+		id:id,
+		from:new Date().setUTCMilliseconds(nowMsec - 360000),
+		to:new Date().setUTCMilliseconds(nowMsec - 240000),
+		fw:"Zellerndorf",
+		fzg:"Pumpe",
+		ppl:9,
+		atsg:0,
+		atst:5
+	};
+	id = elfData.newId();
+	elfData.ek[id] = {
+		id:id,
+		from:new Date().setUTCMilliseconds(nowMsec - 480000),
+		to:null,
+		fw:"Zellerndorf",
+		fzg:"Tank",
+		ppl:9,
+		atsg:3,
+		atst:6
 	};
 
 	ws.onMessage(function(message){
@@ -67,7 +82,9 @@ app.factory("ElfData", function($websocket) {
 			return;
 		}
 		if (msg.typ == "new-etb") {
-			elfData.etb.unshift(msg.data);
+			elfData.etb[msg.data.id] = msg.data;
+		} else if (msg.typ == "update-etb") {
+			elfData.etb[msg.data.id] = msg.data;
 		}
 	});
 
@@ -79,6 +96,25 @@ app.factory("ElfData", function($websocket) {
 app.controller('ElfEtbController', ["$scope", "ElfData", function($scope, ElfData) {
 	$scope.mode = 1;
 
+	var entriesEqual = function(o, n) {
+		if (o.ts != n.ts) {
+			return false;
+		}
+		if (o.to != n.to) {
+			return false;
+		}
+		if (o.from != n.from) {
+			return false;
+		}
+		if (o.msg != n.msg) {
+			return false;
+		}
+		if (o.usr != n.usr) {
+			return false;
+		}
+		return true;
+	}
+
 	var defaultEntry = {
     	to: "",
     	from: "",
@@ -88,7 +124,7 @@ app.controller('ElfEtbController', ["$scope", "ElfData", function($scope, ElfDat
     };
 
 	var now = new Date();
-	$scope.newEntry = $.extend({ts:new Date()}, defaultEntry);
+	$scope.newEntry = angular.extend({id:ElfData.newId(), ts:new Date()}, defaultEntry);
 	$scope.newEntry.usr = "LM Schwayer";
 	$scope.ElfData = ElfData;
 	$scope.etbBefore = {};
@@ -118,18 +154,26 @@ app.controller('ElfEtbController', ["$scope", "ElfData", function($scope, ElfDat
 		}
 		var user = $scope.newEntry.usr;
 		$scope.ElfData.newEtbEntry($scope.newEntry);
-		$scope.newEntry = $.extend({ts:new Date()}, defaultEntry, {usr:user});
-		// TODO: Send 'new entry' message to server
+		$scope.newEntry = angular.extend({id:$scope.ElfData.newId(), ts:new Date()}, defaultEntry, {usr:user});
 	};
 
-	$scope.editEtbEntry = function(i) {
-		$scope.etbBefore[i] = angular.extend({},$scope.ElfData.etb[i]);
-		$scope.ElfData.etb[i].edit = true;
+	$scope.editEtbEntry = function(e) {
+		$scope.etbBefore[e.id] = angular.extend({},e);
+		//$scope.ElfData.etb[i].edit = true;
+		e.edit = true;
 	}
 
-	$scope.saveEtbEntry = function(i) {
-		$scope.ElfData.etb[i].edit = false;
-		// TODO: Send 'save entry' message to server
+	$scope.saveEtbEntry = function(e) {
+		//$scope.ElfData.etb[i].edit = false;
+		e.edit = false;
+		// Check for changes
+		var o = $scope.etbBefore[e.id];
+		if (entriesEqual(o,e)) {
+			console.log("entries equal");
+			return;
+		}
+		// Send 'save entry' message to server
+		$scope.ElfData.updateEtbEntry(e)
 	}
 }]);
 

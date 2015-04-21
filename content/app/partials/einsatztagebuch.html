@@ -20,7 +20,7 @@
 				<td><input class="form-control" ng-model="newEntry.usr" type="text" placeholder="Bearbeiter"></td>
 				<td><button ng-click="addNewEtbEntry()" class="btn btn-success"><span class="glyphicon glyphicon-ok"></span></button></td>
 			</tr>
-			<tr ng-repeat="e in ElfData.etb track by $index">
+			<tr ng-repeat="e in ElfData.etb | orderObjectBy:'ts':true">
 				<td>{{ e.ts | date:"dd.MM.yyyy HH:mm" }}</td>
 				<td ng-hide="e.edit">{{ e.to }}</td>
 				<td ng-show="e.edit"><input class="form-control" ng-model="e.to" type="text" placeholder="An" bs-options="unit for unit in ElfData.units" bs-typeahead></td>
@@ -30,8 +30,8 @@
 				<td ng-show="e.edit"><input class="form-control" ng-model="e.msg" type="text" placeholder="Nachricht"></td>
 				<td ng-hide="e.edit">{{ e.usr }}</td>
 				<td ng-show="e.edit"><input class="form-control" ng-model="e.usr" type="text" placeholder="Bearbeiter"></td>
-				<td ng-hide="e.edit"><button ng-click="editEtbEntry($index)" class="btn btn-warning"><span class="button glyphicon glyphicon-pencil"></span></button></td>
-				<td ng-show="e.edit"><button ng-click="saveEtbEntry($index)" class="btn btn-success"><span class="button glyphicon glyphicon-ok"></span></button></td>
+				<td ng-hide="e.edit"><button ng-click="editEtbEntry(e)" class="btn btn-warning"><span class="button glyphicon glyphicon-pencil"></span></button></td>
+				<td ng-show="e.edit"><button ng-click="saveEtbEntry(e)" class="btn btn-success"><span class="button glyphicon glyphicon-ok"></span></button></td>
 			</tr>
 		</tbody>
 	</table>
