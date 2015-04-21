@@ -6,20 +6,6 @@ import (
 	"time"
 )
 
-/*type Mitglied struct {
-	Dienstgrad string `json:"dienstgrad"`
-	Name       string `json:"name"`
-	Vorname    string `json:"vorname"`
-}
-
-func NewMitglied(dgr, name, first string) *Mitglied {
-	m := new(Mitglied)
-	m.Dienstgrad = dgr
-	m.Name = name
-	m.Vorname = first
-	return m
-}*/
-
 type TagebuchEintrag struct {
 	Id         int       `json:"id"`
 	Timestamp  time.Time `json:"ts"`

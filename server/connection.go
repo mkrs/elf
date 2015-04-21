@@ -40,8 +40,6 @@ func (c *Connection) Reader() {
 		if err != nil {
 			break
 		}
-		// Nachricht verarbeiten
-		//l.Logln(string(msgBytes))
 		c.handleMessage(msgBytes)
 	}
 	c.Sock.Close()
@@ -62,7 +60,6 @@ func (c *Connection) Writer() {
 
 func (c *Connection) handleMessage(bs []byte) {
 	msg := &Message{}
-	//var v interface{}
 	if err := json.Unmarshal(bs, &msg); err != nil {
 		l.Logln("Error unmarshalling", err)
 		return
