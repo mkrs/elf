@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	if err := server.ListenAndServe("."); err != nil {
+	if err := server.ListenAndServe("content"); err != nil {
 		l.Logln("Error serving.", err)
 	}
 	l.Logln("Finished.")
