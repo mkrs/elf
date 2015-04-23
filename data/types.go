@@ -110,13 +110,17 @@ func NewEinheitFromMap(data map[string]interface{}) (*Einheit, error) {
 	} else {
 		return nil, errors.New("Error in type conversion of field 'from'.")
 	}
-	if x, ok := data["to"].(string); ok {
-		e.To = new(time.Time)
-		if err := e.To.UnmarshalJSON([]byte(fmt.Sprintf("\"%s\"", x))); err != nil {
-			return nil, err
-		}
+	if data["to"] == nil {
+		e.To = nil
 	} else {
-		return nil, errors.New("Error in type conversion of field 'to'.")
+		if x, ok := data["to"].(string); ok {
+			e.To = new(time.Time)
+			if err := e.To.UnmarshalJSON([]byte(fmt.Sprintf("\"%s\"", x))); err != nil {
+				return nil, err
+			}
+		} else {
+			return nil, errors.New("Error in type conversion of field 'to'.")
+		}
 	}
 	if x, ok := data["fw"].(string); ok {
 		e.Feuerwehr = x

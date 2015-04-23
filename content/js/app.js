@@ -1,6 +1,20 @@
 
 
-var app = angular.module('elf', ["ngRoute", "angular-websocket", "mgcrea.ngStrap.typeahead"]);
+var app = angular.module('elf', ["ngRoute", "angular-websocket", "ui.bootstrap"]);
+
+
+function isNumeric(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
+function arrayContains(arr, e) {
+	for (var i=arr.length-1; i>=0; i--) {
+		if (arr[i] == e) {
+			return true;
+		}
+	}
+	return false;
+}
 
 
 /* Routes */
@@ -21,18 +35,31 @@ app.config(["$routeProvider", function($routeProvider) {
 
 
 /* Websocket */
-app.factory("ElfData", function($websocket) {
+app.factory("ElfData", ["$websocket","$rootScope", function($websocket, $rootScope) {
 	var url = "ws://" + window.location.host + "/ws";
 	var ws = $websocket(url);
 	var now = new Date();
 	var nowMsec = now.getUTCMilliseconds();
 	var elfData = {
+		einsatz: "",
+		editEinsatz: true,
 		etb: {},
 		ek: {},
-		units: [
-			"EL",
-			"Pumpe Zellerndorf",
-			"Tank Zellerndorf"
+		ta_units: [],
+		ta_usrs: [],
+		ta_fw: [
+			"Zellerndorf",
+			"Watzelsdorf",
+			"Platt",
+			"Deinzendorf",
+			"Pillersdorf"
+		],
+		ta_fzg: [
+			"RüstLösch",
+			"Tank",
+			"Pumpe",
+			"Kommando",
+			"Bus"
 		],
 		newEtbEntry: function(e) {
 			ws.send({typ:"new-etb", data:e});
@@ -46,8 +73,37 @@ app.factory("ElfData", function($websocket) {
 		updateEkEntry: function(e) {
 			ws.send({typ:"update-ek", data:e});
 		},
+		newEkEntry: function(e) {
+			ws.send({typ:"new-ek", data:e});
+		},
 		dumpEtb: function() {
 			ws.send({typ:"dump-etb"});
+		},
+		updateEks: function(id) {
+			var e = this.ek[id];
+			if (e.to === null) {
+				if (arrayContains(this.ta_fw, e.fw) == false) {
+					this.ta_fw.push(e.fw);
+				}
+				var unit = "";
+				if (e.fw != "") unit += e.fw;
+				if (e.fzg != "") unit = e.fzg + " " + unit;
+				if (arrayContains(this.ta_units, unit) == false) {
+					this.ta_units.push(unit);
+				}
+			}
+		},
+		updateEtbs: function(id) {
+			var e = this.etb[id];
+			if (arrayContains(this.ta_units, e.to) == false) {
+				this.ta_units.push(e.to);
+			}
+			if (arrayContains(this.ta_units, e.from) == false) {
+				this.ta_units.push(e.from);
+			}
+			if (arrayContains(this.ta_usrs, e.usr) == false) {
+				this.ta_usrs.push(e.usr);
+			}
 		}
 	};
 
@@ -59,26 +115,45 @@ app.factory("ElfData", function($websocket) {
 		}
 		var t = msg.typ;
 		var id = msg.data.id;
-		if (t == "new-etb") {
+		if (t == "init-etb") {
 			elfData.etb[id] = msg.data;
+			elfData.updateEtbs(id);
+		} else if (t == "new-etb") {
+			elfData.etb[id] = msg.data;
+			elfData.updateEtbs(id);
 		} else if (t == "update-etb") {
 			elfData.etb[id] = msg.data;
+			elfData.updateEtbs(id);
 		} else if (t == "delete-etb") {
 			delete elfData.etb[id];
-		} else if (t == "init-etb") {
-			elfData.etb[id] = msg.data;
 		} else if (t == "init-ek") {
 			elfData.ek[id] = msg.data;
+			elfData.updateEks(id);
+		} else if (t == "new-ek") {
+			elfData.ek[id] = msg.data;
+			elfData.updateEks(id);
+		} else if (t == "update-ek") {
+			elfData.ek[id] = msg.data;
+			elfData.updateEks(id);
+		}
+		var s = t.split("-");
+		if (s.length > 1 && s[1]==="ek") {
+			$rootScope.$broadcast("ek");
 		}
 	});
 
 	return elfData;
-});
+}]);
 
 
 /* Controllers */
+app.controller("IndexController", ["$scope", "ElfData", function($scope,ElfData){
+	$scope.ElfData = ElfData;
+}]);
+
 app.controller('ElfEtbController', ["$timeout", "$compile", "$rootScope", "$scope", "$http", "ElfData", function($timeout, $compile, $rootScope, $scope, $http, ElfData) {
-	$scope.mode = 1;
+	$scope.ElfData = ElfData;
+	$scope.ElfData.mode = 1;
 
 	var entriesEqual = function(o, n) {
 		if (o.ts != n.ts) {
@@ -109,8 +184,7 @@ app.controller('ElfEtbController', ["$timeout", "$compile", "$rootScope", "$scop
 
 	var now = new Date();
 	$scope.newEntry = angular.extend({}, defaultEntry, {ts:new Date()});
-	$scope.newEntry.usr = "LM Schwayer";
-	$scope.ElfData = ElfData;
+	//$scope.newEntry.usr = "";
 	$scope.etbBefore = {};
 
 	setInterval(function(){
@@ -122,23 +196,28 @@ app.controller('ElfEtbController', ["$timeout", "$compile", "$rootScope", "$scop
 	$scope.addNewEtbEntry = function() {
 		if ($scope.newEntry.to == "") {
 			alert("Feld 'An' ist leer.");
+			document.getElementById("NewEntryTo").focus();
 			return;
 		}
 		if ($scope.newEntry.from == "") {
 			alert("Feld 'Von' ist leer.");
+			document.getElementById("NewEntryFrom").focus();
 			return;
 		}
 		if ($scope.newEntry.msg == "") {
 			alert("Feld 'Nachricht' ist leer.");
+			document.getElementById("NewEntryMsg").focus();
 			return;
 		}
 		if ($scope.newEntry.usr == "") {
 			alert("Feld 'Bearbeiter' ist leer.");
+			document.getElementById("NewEntryUsr").focus();
 			return;
 		}
 		var user = $scope.newEntry.usr;
 		$scope.ElfData.newEtbEntry($scope.newEntry);
 		$scope.newEntry = angular.extend({}, defaultEntry, {ts:new Date(), usr:user});
+		document.getElementById("NewEntryTo").focus();
 	};
 
 	$scope.editEtbEntry = function(e) {
@@ -203,11 +282,23 @@ app.controller('ElfEtbController', ["$timeout", "$compile", "$rootScope", "$scop
 	};
 }]);
 
-app.controller("ElfKraefteController", ["$scope", "ElfData", function($scope, ElfData) {
-	$scope.mode = 2;
+app.controller("ElfKraefteController", ["$scope", "$rootScope", "ElfData", function($scope, $rootScope, ElfData) {
 	$scope.ElfData = ElfData;
+	$scope.ElfData.mode = 2;
 	$scope.allSums = {};
 	$scope.actSums = {};
+
+	var defaultEinheit = {
+    	to: null,
+    	from: null,
+    	fw: "",
+    	fzg: "",
+    	ppl: 0,
+    	atsg: 0,
+    	atst: 0
+    };
+
+    $scope.newEinheit = angular.extend({}, defaultEinheit);
 
 	$scope.calculateSums = function() {
 		var allSums = {
@@ -252,16 +343,51 @@ app.controller("ElfKraefteController", ["$scope", "ElfData", function($scope, El
 	};
 
 	$scope.calculateSums();
-	$scope.$watch(function(scope){
-		return scope.ElfData;
-	}, function(newValue, oldValue){
+	$rootScope.$on("ek",function(){
 		$scope.calculateSums();
 	});
 
 	$scope.einheitLeaves = function(e) {
 		var newE = angular.extend({}, e, {to:new Date()});
 		$scope.ElfData.updateEkEntry(newE);
-	}
+	};
+
+	$scope.addEinheit = function() {
+		if (($scope.newEinheit.fw === undefined) || ($scope.newEinheit.fw === "")) {
+			alert("Feuerwehr muss ausgefüllt sein!");
+			document.getElementById('newEinheitFw').focus();
+			return
+		}
+		if (($scope.newEinheit.fzg === undefined) || ($scope.newEinheit.fzg === "")) {
+			alert("Fahrzeug muss ausgefüllt sein!");
+			document.getElementById('newEinheitFzg').focus();
+			return;
+		}
+		if (!isNumeric($scope.newEinheit.ppl)) {
+			alert("Mitglieder ist keine Zahl!");
+			document.getElementById('newEinheitPpl').focus();
+			return;
+		}
+		if (!isNumeric($scope.newEinheit.atsg)) {
+			alert("ATS Geräte ist keine Zahl!");
+			return;
+		}
+		if (!isNumeric($scope.newEinheit.atst)) {
+			alert("ATS Träger ist keine Zahl!");
+			return;
+		}
+		if (+$scope.newEinheit.ppl < 1) {
+			alert("Anzahl der Mitglieder muss >= 1 sein!");
+			document.getElementById('newEinheitPpl').focus();
+			return;
+		}
+		$scope.newEinheit.ppl = +$scope.newEinheit.ppl;
+		$scope.newEinheit.atsg = +$scope.newEinheit.atsg;
+		$scope.newEinheit.atst = +$scope.newEinheit.atst;
+		$scope.newEinheit.from = new Date();
+		$scope.ElfData.newEkEntry($scope.newEinheit);
+		$scope.newEinheit = angular.extend({}, defaultEinheit);
+	};
 }]);
 
 

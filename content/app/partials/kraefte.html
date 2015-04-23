@@ -15,6 +15,15 @@
 					</tr>
 				</thead>
 				<tbody>
+					<tr>
+						<td class="table-min"><button ng-click="addEinheit()" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span></button></td>
+						<td class="table-min"></td>
+						<td><input id="newEinheitFw" class="form-control" ng-model="newEinheit.fw" type="text" placeholder="Feuerwehr" typeahead="fw for fw in ElfData.ta_fw | filter:$viewValue" typeahead-wait-ms="100"></td>
+						<td><input id="newEinheitFzg" class="form-control" ng-model="newEinheit.fzg" type="text" placeholder="Fahrzeug" typeahead="fzg for fzg in ElfData.ta_fzg | filter:$viewValue" typeahead-wait-ms="100"></td>
+						<td><input id="newEinheitPpl" class="form-control" ng-model="newEinheit.ppl" type="text" placeholder="#"></td>
+						<td><input class="form-control" ng-model="newEinheit.atsg" type="text" placeholder="0"></td>
+						<td><input class="form-control" ng-model="newEinheit.atst" type="text" placeholder="0"></td>
+					</tr>
 					<tr ng-repeat="k in ElfData.ek | orderObjectBy:'from':true" ng-if="k.to===null">
 						<td class="table-min">{{ k.from | date:"dd.MM.yyyy HH:mm" }}</td>
 						<td class="table-min"><button ng-click="einheitLeaves(k)" class="btn btn-danger"><span class="glyphicon glyphicon-log-out"></span></button></td>
@@ -39,7 +48,7 @@
 
 		<div class="col-md-3">
 			<h3>Summen (AKTUELL)</h3>
-			<table class="table table-condensed">
+			<table class="table table-condensed sums">
 				<tr>
 					<th>Feuerwehren</th>
 					<td>{{ actSums.fw }}</td>
@@ -63,7 +72,7 @@
 			</table>
 
 			<h3>Summen (GESAMT)</h3>
-			<table class="table table-condensed">
+			<table class="table table-condensed sums">
 				<tr>
 					<th>Feuerwehren</th>
 					<td>{{ allSums.fw }}</td>

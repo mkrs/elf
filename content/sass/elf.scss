@@ -54,6 +54,14 @@ td > ul.typeahead {
 	cursor: pointer;
 }
 
+table.sums {
+  tr {
+    th {
+      width: 70%;
+    }
+  }
+}
+
 footer.footer {
     position: fixed;
     bottom: 0;
@@ -76,6 +84,11 @@ footer.footer {
   @page {
     size: landscape;
   }
+
+  thead {
+    display: table-header-group;
+  }
+
   body * {
     visibility:hidden;
   }

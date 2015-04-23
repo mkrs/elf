@@ -63,6 +63,10 @@ td > ul.typeahead {
   cursor: pointer;
 }
 
+table.sums tr th {
+  width: 70%;
+}
+
 /* line 57, ../sass/elf.scss */
 footer.footer {
   position: fixed;
@@ -85,6 +89,11 @@ footer.footer {
   @page {
     size: landscape;
   }
+
+  thead {
+    display: table-header-group;
+  }
+
   /* line 79, ../sass/elf.scss */
   body * {
     visibility: hidden;

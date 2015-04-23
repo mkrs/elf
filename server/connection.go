@@ -113,6 +113,16 @@ func (c *Connection) handleMessage(bs []byte) {
 		} else {
 			l.Logln(err)
 		}
+	case "new-ek":
+		if e, err := d.NewEinheitFromMap(msg.Data); err == nil {
+			if err := demoProject.AddEinheit(e); err != nil {
+				l.Logln(err)
+				return
+			}
+			c.Broadcast <- NewEinheitMessage(msg.Typ, *e)
+		} else {
+			l.Logln(err)
+		}
 	}
 
 }

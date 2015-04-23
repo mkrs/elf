@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="elf">
+<html ng-app="elf" ng-controller="IndexController">
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -15,30 +15,42 @@
 	<script src="/js/angular-strap.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="/js/angular-strap.tpl.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="/js/parse-options.min.js" type="text/javascript" charset="utf-8"></script>
-	<script src="/js/typeahead.min.js" type="text/javascript" charset="utf-8"></script>
-	<script src="/js/typeahead.tpl.js" type="text/javascript" charset="utf-8"></script>
+	<!--script src="/js/typeahead.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/js/typeahead.tpl.js" type="text/javascript" charset="utf-8"></script-->
+	<script src="/js/ui-bootstrap-tpls-0.12.1.js" type="text/javascript" charset="utf-8"></script>
 	<script src="/js/angular-websocket.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="/js/app.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
 <!-- Navigation -->
 <nav class="navbar navbar-default navbar-fixed-top">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#nav-collapse">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></span>
-      </button>
-      <a class="navbar-brand" href="#/"><img src="/img/icon.png" class="icon" alt="Einsatzleitung Feuerwehr" /></a>
-      <a class="navbar-brand" href="#/">ELF</a>
-    </div>
-    <div class="collapse navbar-collapse" id="nav-collapse">
-      <ul class="nav navbar-nav">
-        <li ng-class="{active:mode==1}"><a href="#/etb" ng-click="mode=1">Einsatztagebuch</a></li>
-        <li ng-class="{active:mode==2}"><a href="#/kraefte" ng-click="mode=2">Eingesetzte Kr&auml;fte</a></li>
-      </ul>
-    </div>
-  </div>
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#nav-collapse">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></span>
+			</button>
+		 </div>
+		 <div class="navbar-header">
+			<a class="navbar-brand" href="#/"><img src="/img/icon.png" class="icon" alt="Einsatzleitung Feuerwehr" /></a>
+		</div>
+		<div class="navbar-header" ng-hide="ElfData.editEinsatz || ElfData.einsatz===''">
+			<a class="navbar-brand" href="#/">{{ ElfData.einsatz }}</a>
+			<a href="" ng-click="ElfData.editEinsatz=true" class="navbar-brand" title="Einsatz bearbeiten"><span class="glyphicon glyphicon-pencil"></span></a>
+		</div>
+		<div class="navbar-header" ng-show="ElfData.editEinsatz || ElfData.einsatz===''">
+			<form class="navbar-form navbar-left">
+				<input ng-model="ElfData.einsatz" type="text" class="form-control" placeholder="Einsatz">
+				<button ng-click="ElfData.editEinsatz=false" class="btn btn-success"><span class="glyphicon glyphicon-ok"></span></button>
+			</form>
+		</div>
+		<div class="collapse navbar-collapse" id="nav-collapse">
+			<ul class="nav navbar-nav">
+				<li ng-class="{active:ElfData.mode==1}"><a href="#/etb" ng-click="ElfData.mode=1">Einsatztagebuch</a></li>
+				<li ng-class="{active:ElfData.mode==2}"><a href="#/kraefte" ng-click="ElfData.mode=2">Eingesetzte Kr&auml;fte</a></li>
+			</ul>
+		</div>
+	</div>
 </nav>
 <!-- /Navigation -->
 

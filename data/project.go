@@ -37,9 +37,11 @@ func NewDemoProject(name string) *Project {
 	tb := NewTagebuchEintrag("EL", "Pumpe Zellerndorf", "Zubringleitung fertig!", "LM Schwayer")
 	tb.Timestamp = tb.Timestamp.Add(-5 * time.Minute)
 	p.AddTagebuchEintrag(tb)
-	tb1 := NewTagebuchEintrag("Pumpe Zellerndorf", "EL", "Wasser Marsch!", "LM Schwayer")
-	tb1.Timestamp = tb1.Timestamp.Add(-2 * time.Minute)
-	p.AddTagebuchEintrag(tb1)
+	for i := 0; i < 30; i++ {
+		tb1 := NewTagebuchEintrag("Pumpe Zellerndorf", "EL", "Wasser Marsch!", "LM Schwayer")
+		tb1.Timestamp = tb1.Timestamp.Add(-2 * time.Minute)
+		p.AddTagebuchEintrag(tb1)
+	}
 	n := time.Now()
 	now := &n
 	t1 := now.Add(-10 * time.Minute)

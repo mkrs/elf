@@ -12,7 +12,7 @@ var demoProject *d.Project = nil
 
 func ListenAndServe(rootpath string) error {
 	// Demo Project
-	demoProject = d.NewDemoProject("Demo")
+	demoProject = d.NewProject("Demo")
 	// Messaging Hub
 	hub := NewHub()
 	go hub.Run()
