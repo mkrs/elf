@@ -15,6 +15,10 @@ type TagebuchEintrag struct {
 	Bearbeiter string    `json:"usr"`
 }
 
+func (tb TagebuchEintrag) String() string {
+	return fmt.Sprintf("Id: %d, Zeit: %s, An: %s, Von: %s, Inhalt: %s, Bearbeiter: %s", tb.Id, tb.Timestamp.Format("2006-01-02 15:04"), tb.An, tb.Von, tb.Inhalt, tb.Bearbeiter)
+}
+
 func NewTagebuchEintrag(an, von, inhalt, bearbeiter string) *TagebuchEintrag {
 	e := new(TagebuchEintrag)
 	e.Timestamp = time.Now()

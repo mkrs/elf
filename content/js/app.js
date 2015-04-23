@@ -40,8 +40,14 @@ app.factory("ElfData", function($websocket) {
 		updateEtbEntry: function(e) {
 			ws.send({typ:"update-etb", data:e});
 		},
+		deleteEtbEntry: function(e) {
+			ws.send({typ:"delete-etb", data:e});
+		},
 		updateEkEntry: function(e) {
 			ws.send({typ:"update-ek", data:e});
+		},
+		dumpEtb: function() {
+			ws.send({typ:"dump-etb"});
 		}
 	};
 
@@ -57,6 +63,8 @@ app.factory("ElfData", function($websocket) {
 			elfData.etb[id] = msg.data;
 		} else if (t == "update-etb") {
 			elfData.etb[id] = msg.data;
+		} else if (t == "delete-etb") {
+			delete elfData.etb[id];
 		} else if (t == "init-etb") {
 			elfData.etb[id] = msg.data;
 		} else if (t == "init-ek") {
@@ -137,7 +145,7 @@ app.controller('ElfEtbController', ["$scope", "ElfData", function($scope, ElfDat
 		$scope.etbBefore[e.id] = angular.copy(e);
 		//$scope.ElfData.etb[i].edit = true;
 		e.edit = true;
-	}
+	};
 
 	$scope.saveEtbEntry = function(e) {
 		//$scope.ElfData.etb[i].edit = false;
@@ -150,6 +158,17 @@ app.controller('ElfEtbController', ["$scope", "ElfData", function($scope, ElfDat
 		}
 		// Send 'save entry' message to server
 		$scope.ElfData.updateEtbEntry(e)
+	};
+
+	$scope.deleteEtbEntry = function(e) {
+		var ret = confirm("Sind Sie sicher, dass der Eintrag:\n\nAn: " + e.to + "\nVon: " + e.from + "\nNachricht: " + e.msg + "\n\ngelöscht werden soll?");
+		if (ret == true) {
+			$scope.ElfData.deleteEtbEntry(e);
+		}
+	};
+
+	$scope.dumpEtb = function() {
+		$scope.ElfData.dumpEtb();
 	}
 }]);
 
@@ -202,7 +221,9 @@ app.controller("ElfKraefteController", ["$scope", "ElfData", function($scope, El
 	};
 
 	$scope.calculateSums();
-	$scope.$watch(function(scope){ return scope.ElfData; }, function(newValue, oldValue){
+	$scope.$watch(function(scope){
+		return scope.ElfData;
+	}, function(newValue, oldValue){
 		$scope.calculateSums();
 	});
 

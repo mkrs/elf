@@ -57,10 +57,10 @@ func (h *Hub) broadcast(m *Message, conn *Connection) {
 func (h *Hub) initConnectionWithData(c *Connection) {
 	etb := demoProject.GetTagebuch()
 	for _, tb := range etb {
-		c.Send <- NewTagebuchMessage(tb)
+		c.Send <- NewTagebuchMessage("init-etb", tb)
 	}
 	ek := demoProject.GetEinheiten()
 	for _, k := range ek {
-		c.Send <- NewEinheitMessage(k)
+		c.Send <- NewEinheitMessage("init-ek", k)
 	}
 }

@@ -14,9 +14,9 @@ type UpdateMessage struct {
 	msg *Message
 }
 
-func NewTagebuchMessage(tb d.TagebuchEintrag) *Message {
+func NewTagebuchMessage(typ string, tb d.TagebuchEintrag) *Message {
 	m := new(Message)
-	m.Typ = "init-etb"
+	m.Typ = typ
 	m.Data = make(map[string]interface{})
 	m.Data["id"] = tb.Id
 	m.Data["ts"] = tb.Timestamp
@@ -28,9 +28,9 @@ func NewTagebuchMessage(tb d.TagebuchEintrag) *Message {
 	return m
 }
 
-func NewEinheitMessage(e d.Einheit) *Message {
+func NewEinheitMessage(typ string, e d.Einheit) *Message {
 	m := new(Message)
-	m.Typ = "init-ek"
+	m.Typ = typ
 	m.Data = make(map[string]interface{})
 	m.Data["id"] = e.Id
 	m.Data["from"] = e.From

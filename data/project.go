@@ -2,17 +2,19 @@ package data
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 	"time"
 )
 
 type Project struct {
-	id    int
-	name  string
-	maxId int
-	etb   map[int]TagebuchEintrag
-	ek    map[int]Einheit
-	mutex *sync.Mutex
+	id     int
+	name   string
+	maxId  int
+	etb    map[int]TagebuchEintrag
+	etbDel []TagebuchEintrag
+	ek     map[int]Einheit
+	mutex  *sync.Mutex
 }
 
 func NewProject(name string) *Project {
@@ -127,4 +129,22 @@ func (p *Project) UpdateEinheit(e Einheit) error {
 
 	p.ek[e.Id] = e
 	return nil
+}
+
+func (p *Project) DeleteTagebuchEintrag(tb TagebuchEintrag) error {
+	if _, present := p.etb[tb.Id]; !present {
+		return errors.New("DeleteTagebuchEintrag: TagebuchEintrag with id not found.")
+	}
+
+	p.etbDel = append(p.etbDel, tb)
+	delete(p.etb, tb.Id)
+	return nil
+}
+
+func (p Project) DumpEtb() string {
+	ret := ""
+	for _, x := range p.etb {
+		ret += fmt.Sprintf("%s\n", x)
+	}
+	return ret
 }

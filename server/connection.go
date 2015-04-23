@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/websocket"
 	d "github.com/mkrs/elf/data"
 	l "github.com/mkrs/elf/log"
@@ -68,7 +69,8 @@ func (c *Connection) handleMessage(bs []byte) {
 
 	switch msg.Typ {
 	case "dump-etb":
-		// TODO
+		l.Logln("Dump EinsatzTagebuch")
+		fmt.Println(demoProject.DumpEtb())
 	case "dump-ek":
 		// TODO
 	case "new-etb":
@@ -77,7 +79,7 @@ func (c *Connection) handleMessage(bs []byte) {
 				l.Logln(err)
 				return
 			}
-			c.Broadcast <- NewTagebuchMessage(*tb)
+			c.Broadcast <- NewTagebuchMessage(msg.Typ, *tb)
 		} else {
 			l.Logln(err)
 		}
@@ -87,7 +89,17 @@ func (c *Connection) handleMessage(bs []byte) {
 				l.Logln(err)
 				return
 			}
-			c.Broadcast <- NewTagebuchMessage(*tb)
+			c.Broadcast <- NewTagebuchMessage(msg.Typ, *tb)
+		} else {
+			l.Logln(err)
+		}
+	case "delete-etb":
+		if tb, err := d.NewTagebuchEintragFromMap(msg.Data); err == nil {
+			if err := demoProject.DeleteTagebuchEintrag(*tb); err != nil {
+				l.Logln(err)
+				return
+			}
+			c.Broadcast <- NewTagebuchMessage(msg.Typ, *tb)
 		} else {
 			l.Logln(err)
 		}
@@ -97,7 +109,7 @@ func (c *Connection) handleMessage(bs []byte) {
 				l.Logln(err)
 				return
 			}
-			c.Broadcast <- NewEinheitMessage(*e)
+			c.Broadcast <- NewEinheitMessage(msg.Typ, *e)
 		} else {
 			l.Logln(err)
 		}

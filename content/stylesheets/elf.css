@@ -10,54 +10,91 @@ body {
 
 /* line 12, ../sass/elf.scss */
 #content {
-  padding-top: 70px;
+  padding-top: 60px;
+  padding-bottom: 20px;
 }
 
 /* Navigation */
-/* line 17, ../sass/elf.scss */
+/* line 18, ../sass/elf.scss */
 .navbar .active {
   font-weight: bold;
 }
 
 /* Einsatztagebuch */
-/* line 22, ../sass/elf.scss */
+/* line 23, ../sass/elf.scss */
 #new input {
   width: 100%;
 }
 
-/* line 26, ../sass/elf.scss */
+/* line 27, ../sass/elf.scss */
 th.table-timestamp {
   width: 14%;
 }
 
-/* line 30, ../sass/elf.scss */
+/* line 31, ../sass/elf.scss */
 th.table-unit {
   width: 13%;
 }
 
-/* line 34, ../sass/elf.scss */
+/* line 35, ../sass/elf.scss */
 th.table-message {
   width: 45%;
 }
 
-/* line 38, ../sass/elf.scss */
+/* line 39, ../sass/elf.scss */
 th.table-person {
   width: 13%;
 }
 
-/* line 42, ../sass/elf.scss */
+/* line 43, ../sass/elf.scss */
 th.table-icons {
   width: 2%;
 }
 
-/* line 46, ../sass/elf.scss */
+/* line 47, ../sass/elf.scss */
 th.table-min,
 td.table-min {
   width: 1%;
   white-space: nowrap;
 }
 
-/* line 51, ../sass/elf.scss */
+/* line 53, ../sass/elf.scss */
 td > ul.typeahead {
   cursor: pointer;
+}
+
+/* line 57, ../sass/elf.scss */
+footer.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 35px;
+  background-color: #555;
+  padding: 6px;
+}
+
+@media screen {
+  /* line 69, ../sass/elf.scss */
+  #printSection {
+    display: none;
+  }
+}
+@media print {
+  /* line 75, ../sass/elf.scss */
+  body * {
+    visibility: hidden;
+  }
+
+  /* line 78, ../sass/elf.scss */
+  #printSection, #printSection * {
+    visibility: visible;
+  }
+
+  /* line 81, ../sass/elf.scss */
+  #printSection {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
 }
