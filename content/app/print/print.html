@@ -1,11 +1,30 @@
 <header>
-
+	<h1>Einsatztagebuch</h1>
 </header>
 
 <section>
-
+	<table class="table table-condensed table-bordered">
+		<thead>
+			<tr>
+				<th class="table-timestamp">Datum / Zeit</th>
+				<th class="table-unit">An</th>
+				<th class="table-unit">Von</th>
+				<th class="table-message">Nachricht</th>
+				<th class="table-person">Bearbeiter</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="e in etb | orderObjectBy:'ts':true">
+				<td>{{ e.ts | date:"dd.MM.yyyy HH:mm" }}</td>
+				<td ng-hide="e.edit">{{ e.to }}</td>
+				<td ng-show="e.edit"><input class="form-control" ng-model="e.to" type="text" placeholder="An"></td>
+				<td ng-hide="e.edit">{{ e.from }}</td>
+				<td ng-show="e.edit"><input class="form-control" ng-model="e.from" type="text" placeholder="Von"></td>
+				<td ng-hide="e.edit">{{ e.msg }}</td>
+				<td ng-show="e.edit"><input class="form-control" ng-model="e.msg" type="text" placeholder="Nachricht"></td>
+				<td ng-hide="e.edit">{{ e.usr }}</td>
+				<td ng-show="e.edit"><input class="form-control" ng-model="e.usr" type="text" placeholder="Bearbeiter"></td>
+			</tr>
+		</tbody>
+	</table>
 </section>
-
-<footer>
-
-</footer>

@@ -72,26 +72,30 @@ footer.footer {
   height: 35px;
   background-color: #555;
   padding: 6px;
+  text-align: right;
 }
 
 @media screen {
-  /* line 69, ../sass/elf.scss */
+  /* line 70, ../sass/elf.scss */
   #printSection {
     display: none;
   }
 }
 @media print {
-  /* line 75, ../sass/elf.scss */
+  @page {
+    size: landscape;
+  }
+  /* line 79, ../sass/elf.scss */
   body * {
     visibility: hidden;
   }
 
-  /* line 78, ../sass/elf.scss */
+  /* line 82, ../sass/elf.scss */
   #printSection, #printSection * {
     visibility: visible;
   }
 
-  /* line 81, ../sass/elf.scss */
+  /* line 85, ../sass/elf.scss */
   #printSection {
     position: absolute;
     left: 0;

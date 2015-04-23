@@ -77,7 +77,7 @@ app.factory("ElfData", function($websocket) {
 
 
 /* Controllers */
-app.controller('ElfEtbController', ["$scope", "ElfData", function($scope, ElfData) {
+app.controller('ElfEtbController', ["$timeout", "$compile", "$rootScope", "$scope", "$http", "ElfData", function($timeout, $compile, $rootScope, $scope, $http, ElfData) {
 	$scope.mode = 1;
 
 	var entriesEqual = function(o, n) {
@@ -169,7 +169,38 @@ app.controller('ElfEtbController', ["$scope", "ElfData", function($scope, ElfDat
 
 	$scope.dumpEtb = function() {
 		$scope.ElfData.dumpEtb();
+	};
+
+	var printElement = function(elem) {
+		//var domClone = elem.cloneNode(true);
+		var domClone = elem[0];
+		var $printSection = document.getElementById("printSection");
+		if (!$printSection) {
+			var $printSection = document.createElement("div");
+			$printSection.id = "printSection";
+			document.body.appendChild($printSection);
+		}
+		$printSection.innerHTML = "";
+		$printSection.appendChild(domClone);
 	}
+
+	$scope.print = function() {
+		$http.get("app/print/print.html").success(function(template){
+        var printScope = angular.extend($rootScope.$new(), $scope.ElfData);
+        var compiledPrint = $compile($('<div>' + template + '</div>'));
+        var element = compiledPrint(printScope);
+        var waitForRenderAndPrint = function() {
+            if(printScope.$$phase || $http.pendingRequests.length) {
+                $timeout(waitForRenderAndPrint);
+            } else {
+                printElement(element);
+                window.print();
+                printScope.$destroy();
+            }
+        }
+        waitForRenderAndPrint();
+    });
+	};
 }]);
 
 app.controller("ElfKraefteController", ["$scope", "ElfData", function($scope, ElfData) {
