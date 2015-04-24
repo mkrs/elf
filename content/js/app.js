@@ -34,6 +34,23 @@ app.config(["$routeProvider", function($routeProvider) {
 }]);
 
 
+/* Directives */
+app.directive('elfOnEnterUp', function(){
+ return {
+	  restrict: 'A',
+	  link: function(scope, elem, attr, ctrl) {
+			elem.bind('keyup', function(evt){
+				evt = evt || window.event;
+				// Return if not Enter Key
+				if (evt.keyCode != 13) return;
+				scope.$apply(function(s) {
+					s.$eval(attr.elfOnEnterUp);
+				});
+			});
+	  } };
+});
+
+
 /* Websocket */
 app.factory("ElfData", ["$websocket","$rootScope", function($websocket, $rootScope) {
 	var url = "ws://" + window.location.host + "/ws";
@@ -110,7 +127,7 @@ app.factory("ElfData", ["$websocket","$rootScope", function($websocket, $rootSco
 	ws.onMessage(function(message){
 		var msg = JSON.parse(message.data);
 		if ((msg.typ === undefined) ||
-		    (msg.data === undefined)) {
+			 (msg.data === undefined)) {
 			return;
 		}
 		var t = msg.typ;
@@ -175,12 +192,12 @@ app.controller('ElfEtbController', ["$timeout", "$compile", "$rootScope", "$scop
 	}
 
 	var defaultEntry = {
-    	to: "",
-    	from: "",
-    	msg: "",
-    	usr: "",
-    	edit: false
-    };
+		to: "",
+		from: "",
+		msg: "",
+		usr: "",
+		edit: false
+	 };
 
 	var now = new Date();
 	$scope.newEntry = angular.extend({}, defaultEntry, {ts:new Date()});
@@ -194,14 +211,11 @@ app.controller('ElfEtbController', ["$timeout", "$compile", "$rootScope", "$scop
 	},1000);
 
 	$scope.addNewEtbEntry = function() {
-		if ($scope.newEntry.to == "") {
-			alert("Feld 'An' ist leer.");
+		var bTo = $scope.newEntry.to == "";
+		var bFrom = $scope.newEntry.from == "";
+		if (bTo && bFrom) {
+			alert("Feld 'An' und 'Von' dürfen nicht beide leer sein.");
 			document.getElementById("NewEntryTo").focus();
-			return;
-		}
-		if ($scope.newEntry.from == "") {
-			alert("Feld 'Von' ist leer.");
-			document.getElementById("NewEntryFrom").focus();
 			return;
 		}
 		if ($scope.newEntry.msg == "") {
@@ -265,20 +279,20 @@ app.controller('ElfEtbController', ["$timeout", "$compile", "$rootScope", "$scop
 
 	$scope.print = function() {
 		$http.get("app/print/print.html").success(function(template){
-        var printScope = angular.extend($rootScope.$new(), $scope.ElfData);
-        var compiledPrint = $compile($('<div>' + template + '</div>'));
-        var element = compiledPrint(printScope);
-        var waitForRenderAndPrint = function() {
-            if(printScope.$$phase || $http.pendingRequests.length) {
-                $timeout(waitForRenderAndPrint);
-            } else {
-                printElement(element);
-                window.print();
-                printScope.$destroy();
-            }
-        }
-        waitForRenderAndPrint();
-    });
+		  var printScope = angular.extend($rootScope.$new(), $scope.ElfData);
+		  var compiledPrint = $compile($('<div>' + template + '</div>'));
+		  var element = compiledPrint(printScope);
+		  var waitForRenderAndPrint = function() {
+				if(printScope.$$phase || $http.pendingRequests.length) {
+					 $timeout(waitForRenderAndPrint);
+				} else {
+					 printElement(element);
+					 window.print();
+					 printScope.$destroy();
+				}
+		  }
+		  waitForRenderAndPrint();
+	 });
 	};
 }]);
 
@@ -289,16 +303,16 @@ app.controller("ElfKraefteController", ["$scope", "$rootScope", "ElfData", funct
 	$scope.actSums = {};
 
 	var defaultEinheit = {
-    	to: null,
-    	from: null,
-    	fw: "",
-    	fzg: "",
-    	ppl: 0,
-    	atsg: 0,
-    	atst: 0
-    };
+		to: null,
+		from: null,
+		fw: "",
+		fzg: "",
+		ppl: 0,
+		atsg: 0,
+		atst: 0
+	 };
 
-    $scope.newEinheit = angular.extend({}, defaultEinheit);
+	 $scope.newEinheit = angular.extend({}, defaultEinheit);
 
 	$scope.calculateSums = function() {
 		var allSums = {

@@ -14,10 +14,10 @@
 		<tbody>
 			<tr id="new">
 				<td>{{ newEntry.ts | date:"dd.MM.yyyy HH:mm:ss" }}</td>
-				<td><input id="NewEntryTo" class="form-control" ng-model="newEntry.to" type="text" placeholder="An" typeahead="unit for unit in ElfData.ta_units | filter:$viewValue" typeahead-wait-ms="100"></td>
-				<td><input id="NewEntryFrom" class="form-control" ng-model="newEntry.from" type="text" placeholder="Von" typeahead="unit for unit in ElfData.ta_units | filter:$viewValue" typeahead-wait-ms="100"></td>
-				<td><input id="NewEntryMsg" class="form-control" ng-model="newEntry.msg" type="text" placeholder="Nachricht"></td>
-				<td><input id="NewEntryUsr" class="form-control" ng-model="newEntry.usr" type="text" placeholder="Bearbeiter" typeahead="usr for usr in ElfData.ta_usrs | filter:$viewValue" typeahead-wait-ms="100"></td>
+				<td><input id="NewEntryTo" class="form-control" ng-model="newEntry.to" type="text" placeholder="An" typeahead="unit for unit in ElfData.ta_units | filter:$viewValue" typeahead-wait-ms="100" typeahead-focus-first="false" elf-on-enter-up="addNewEtbEntry()"></td>
+				<td><input id="NewEntryFrom" class="form-control" ng-model="newEntry.from" type="text" placeholder="Von" typeahead="unit for unit in ElfData.ta_units | filter:$viewValue" typeahead-wait-ms="100" typeahead-focus-first="false" elf-on-enter-up="addNewEtbEntry()"></td>
+				<td><input id="NewEntryMsg" class="form-control" ng-model="newEntry.msg" type="text" placeholder="Nachricht"  elf-on-enter-up="addNewEtbEntry()"></td>
+				<td><input id="NewEntryUsr" class="form-control" ng-model="newEntry.usr" type="text" placeholder="Bearbeiter" typeahead="usr for usr in ElfData.ta_usrs | filter:$viewValue" typeahead-wait-ms="100" typeahead-focus-first="false" elf-on-enter-up="addNewEtbEntry()"></td>
 				<td><button ng-click="addNewEtbEntry()" class="btn btn-success"><span class="glyphicon glyphicon-ok"></span></button></td>
 			</tr>
 			<tr ng-repeat="e in ElfData.etb | orderObjectBy:'ts':true">
