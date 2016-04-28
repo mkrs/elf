@@ -8,8 +8,9 @@ import (
 	"net/http"
 )
 
-var demoProject *d.Project = nil
+var demoProject *d.Project
 
+// ListenAndServe starts the ELF server
 func ListenAndServe(rootpath string) error {
 	// Demo Project
 	demoProject = d.NewProject("Demo")
