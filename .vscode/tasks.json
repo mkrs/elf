@@ -1,0 +1,28 @@
+{
+    "version": "0.1.0",
+    "command": "go",
+    "isShellCommand": true,
+    //"showOutput": "silent",
+    "tasks": [
+        {
+            "taskName": "build",
+            "args": [ "-v", "./..."],
+            "isBuildCommand": true,
+				"problemMatcher": {
+					"owner": "go",
+					"fileLocation": ["relative", "${cwd}"],
+					"pattern": {
+						"regexp": "^(.+)\\:(\\d+)\\:(.+)$",
+						"file": 1,
+						"location": 2,
+						"message": 3
+					}
+				}
+        },
+        {
+            "taskName": "test",
+            "args": [ "-v", "./..."],
+            "isTestCommand": true
+        }
+    ]
+}
