@@ -4,11 +4,11 @@ var app = angular.module('elf', ["ngRoute", "angular-websocket", "ui.bootstrap"]
 
 
 function isNumeric(n) {
-  return !isNaN(parseFloat(n)) && isFinite(n);
+	return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
 function arrayContains(arr, e) {
-	for (var i=arr.length-1; i>=0; i--) {
+	for (var i = arr.length - 1; i >= 0; i--) {
 		if (arr[i] == e) {
 			return true;
 		}
@@ -18,41 +18,46 @@ function arrayContains(arr, e) {
 
 
 /* Routes */
-app.config(["$routeProvider", function($routeProvider) {
+app.config(["$routeProvider", function ($routeProvider) {
 	$routeProvider
-	.when("/etb", {
-		templateUrl: "app/partials/einsatztagebuch.html",
-		controller: "ElfEtbController"
-	})
-	.when("/kraefte", {
-		templateUrl: "app/partials/kraefte.html",
-		controller: "ElfKraefteController"
-	})
-	.otherwise({
-		redirectTo: "/etb"
-	});
+		.when("/etb", {
+			templateUrl: "app/partials/einsatztagebuch.html",
+			controller: "ElfEtbController"
+		})
+		.when("/kraefte", {
+			templateUrl: "app/partials/kraefte.html",
+			controller: "ElfKraefteController"
+		})
+		.when("/drucken", {
+			templateUrl: "app/partials/drucken.html",
+			controller: "ElfDruckenController"
+		})
+		.otherwise({
+			redirectTo: "/etb"
+		});
 }]);
 
 
 /* Directives */
-app.directive('elfOnEnterUp', function(){
- return {
-	  restrict: 'A',
-	  link: function(scope, elem, attr, ctrl) {
-			elem.bind('keyup', function(evt){
+app.directive('elfOnEnterUp', function () {
+	return {
+		restrict: 'A',
+		link: function (scope, elem, attr, ctrl) {
+			elem.bind('keyup', function (evt) {
 				evt = evt || window.event;
 				// Return if not Enter Key
 				if (evt.keyCode != 13) return;
-				scope.$apply(function(s) {
+				scope.$apply(function (s) {
 					s.$eval(attr.elfOnEnterUp);
 				});
 			});
-	  } };
+		}
+	};
 });
 
 
 /* Websocket */
-app.factory("ElfData", ["$websocket","$rootScope", function($websocket, $rootScope) {
+app.factory("ElfData", ["$websocket", "$rootScope", function ($websocket, $rootScope) {
 	var url = "ws://" + window.location.host + "/ws";
 	var ws = $websocket(url);
 	var now = new Date();
@@ -78,25 +83,25 @@ app.factory("ElfData", ["$websocket","$rootScope", function($websocket, $rootSco
 			"Kommando",
 			"Bus"
 		],
-		newEtbEntry: function(e) {
-			ws.send({typ:"new-etb", data:e});
+		newEtbEntry: function (e) {
+			ws.send({ typ: "new-etb", data: e });
 		},
-		updateEtbEntry: function(e) {
-			ws.send({typ:"update-etb", data:e});
+		updateEtbEntry: function (e) {
+			ws.send({ typ: "update-etb", data: e });
 		},
-		deleteEtbEntry: function(e) {
-			ws.send({typ:"delete-etb", data:e});
+		deleteEtbEntry: function (e) {
+			ws.send({ typ: "delete-etb", data: e });
 		},
-		updateEkEntry: function(e) {
-			ws.send({typ:"update-ek", data:e});
+		updateEkEntry: function (e) {
+			ws.send({ typ: "update-ek", data: e });
 		},
-		newEkEntry: function(e) {
-			ws.send({typ:"new-ek", data:e});
+		newEkEntry: function (e) {
+			ws.send({ typ: "new-ek", data: e });
 		},
-		dumpEtb: function() {
-			ws.send({typ:"dump-etb"});
+		dumpEtb: function () {
+			ws.send({ typ: "dump-etb" });
 		},
-		updateEks: function(id) {
+		updateEks: function (id) {
 			var e = this.ek[id];
 			if (e.to === null) {
 				if (arrayContains(this.ta_fw, e.fw) == false) {
@@ -110,7 +115,7 @@ app.factory("ElfData", ["$websocket","$rootScope", function($websocket, $rootSco
 				}
 			}
 		},
-		updateEtbs: function(id) {
+		updateEtbs: function (id) {
 			var e = this.etb[id];
 			if (arrayContains(this.ta_units, e.to) == false) {
 				this.ta_units.push(e.to);
@@ -124,10 +129,10 @@ app.factory("ElfData", ["$websocket","$rootScope", function($websocket, $rootSco
 		}
 	};
 
-	ws.onMessage(function(message){
+	ws.onMessage(function (message) {
 		var msg = JSON.parse(message.data);
 		if ((msg.typ === undefined) ||
-			 (msg.data === undefined)) {
+			(msg.data === undefined)) {
 			return;
 		}
 		var t = msg.typ;
@@ -154,7 +159,7 @@ app.factory("ElfData", ["$websocket","$rootScope", function($websocket, $rootSco
 			elfData.updateEks(id);
 		}
 		var s = t.split("-");
-		if (s.length > 1 && s[1]==="ek") {
+		if (s.length > 1 && s[1] === "ek") {
 			$rootScope.$broadcast("ek");
 		}
 	});
@@ -164,15 +169,15 @@ app.factory("ElfData", ["$websocket","$rootScope", function($websocket, $rootSco
 
 
 /* Controllers */
-app.controller("IndexController", ["$scope", "ElfData", function($scope,ElfData){
+app.controller("IndexController", ["$scope", "ElfData", function ($scope, ElfData) {
 	$scope.ElfData = ElfData;
 }]);
 
-app.controller('ElfEtbController', ["$timeout", "$compile", "$rootScope", "$scope", "$http", "ElfData", function($timeout, $compile, $rootScope, $scope, $http, ElfData) {
+app.controller('ElfEtbController', ["$timeout", "$compile", "$rootScope", "$scope", "$http", "ElfData", function ($timeout, $compile, $rootScope, $scope, $http, ElfData) {
 	$scope.ElfData = ElfData;
 	$scope.ElfData.mode = 1;
 
-	var entriesEqual = function(o, n) {
+	var entriesEqual = function (o, n) {
 		if (o.ts != n.ts) {
 			return false;
 		}
@@ -197,20 +202,20 @@ app.controller('ElfEtbController', ["$timeout", "$compile", "$rootScope", "$scop
 		msg: "",
 		usr: "",
 		edit: false
-	 };
+	};
 
 	var now = new Date();
-	$scope.newEntry = angular.extend({}, defaultEntry, {ts:new Date()});
+	$scope.newEntry = angular.extend({}, defaultEntry, { ts: new Date() });
 	//$scope.newEntry.usr = "";
 	$scope.etbBefore = {};
 
-	setInterval(function(){
-		$scope.$apply(function(){
+	setInterval(function () {
+		$scope.$apply(function () {
 			$scope.newEntry.ts = new Date();
 		});
-	},1000);
+	}, 1000);
 
-	$scope.addNewEtbEntry = function() {
+	$scope.addNewEtbEntry = function () {
 		var bTo = $scope.newEntry.to == "";
 		var bFrom = $scope.newEntry.from == "";
 		if (bTo && bFrom) {
@@ -230,22 +235,22 @@ app.controller('ElfEtbController', ["$timeout", "$compile", "$rootScope", "$scop
 		}
 		var user = $scope.newEntry.usr;
 		$scope.ElfData.newEtbEntry($scope.newEntry);
-		$scope.newEntry = angular.extend({}, defaultEntry, {ts:new Date(), usr:user});
+		$scope.newEntry = angular.extend({}, defaultEntry, { ts: new Date(), usr: user });
 		document.getElementById("NewEntryTo").focus();
 	};
 
-	$scope.editEtbEntry = function(e) {
+	$scope.editEtbEntry = function (e) {
 		$scope.etbBefore[e.id] = angular.copy(e);
 		//$scope.ElfData.etb[i].edit = true;
 		e.edit = true;
 	};
 
-	$scope.saveEtbEntry = function(e) {
+	$scope.saveEtbEntry = function (e) {
 		//$scope.ElfData.etb[i].edit = false;
 		e.edit = false;
 		// Check for changes
 		var o = $scope.etbBefore[e.id];
-		if (entriesEqual(o,e)) {
+		if (entriesEqual(o, e)) {
 			console.log("entries equal");
 			return;
 		}
@@ -253,18 +258,18 @@ app.controller('ElfEtbController', ["$timeout", "$compile", "$rootScope", "$scop
 		$scope.ElfData.updateEtbEntry(e)
 	};
 
-	$scope.deleteEtbEntry = function(e) {
+	$scope.deleteEtbEntry = function (e) {
 		var ret = confirm("Sind Sie sicher, dass der Eintrag:\n\nAn: " + e.to + "\nVon: " + e.from + "\nNachricht: " + e.msg + "\n\ngelöscht werden soll?");
 		if (ret == true) {
 			$scope.ElfData.deleteEtbEntry(e);
 		}
 	};
 
-	$scope.dumpEtb = function() {
+	$scope.dumpEtb = function () {
 		$scope.ElfData.dumpEtb();
 	};
 
-	var printElement = function(elem) {
+	var printElement = function (elem) {
 		//var domClone = elem.cloneNode(true);
 		var domClone = elem[0];
 		var $printSection = document.getElementById("printSection");
@@ -277,26 +282,26 @@ app.controller('ElfEtbController', ["$timeout", "$compile", "$rootScope", "$scop
 		$printSection.appendChild(domClone);
 	}
 
-	$scope.print = function() {
-		$http.get("app/print/print.html").success(function(template){
-		  var printScope = angular.extend($rootScope.$new(), $scope.ElfData);
-		  var compiledPrint = $compile($('<div>' + template + '</div>'));
-		  var element = compiledPrint(printScope);
-		  var waitForRenderAndPrint = function() {
-				if(printScope.$$phase || $http.pendingRequests.length) {
-					 $timeout(waitForRenderAndPrint);
+	$scope.print = function () {
+		$http.get("app/print/print.html").success(function (template) {
+			var printScope = angular.extend($rootScope.$new(), $scope.ElfData);
+			var compiledPrint = $compile($('<div>' + template + '</div>'));
+			var element = compiledPrint(printScope);
+			var waitForRenderAndPrint = function () {
+				if (printScope.$$phase || $http.pendingRequests.length) {
+					$timeout(waitForRenderAndPrint);
 				} else {
-					 printElement(element);
-					 window.print();
-					 printScope.$destroy();
+					printElement(element);
+					window.print();
+					printScope.$destroy();
 				}
-		  }
-		  waitForRenderAndPrint();
-	 });
+			}
+			waitForRenderAndPrint();
+		});
 	};
 }]);
 
-app.controller("ElfKraefteController", ["$scope", "$rootScope", "ElfData", function($scope, $rootScope, ElfData) {
+app.controller("ElfKraefteController", ["$scope", "$rootScope", "ElfData", function ($scope, $rootScope, ElfData) {
 	$scope.ElfData = ElfData;
 	$scope.ElfData.mode = 2;
 	$scope.allSums = {};
@@ -310,26 +315,26 @@ app.controller("ElfKraefteController", ["$scope", "$rootScope", "ElfData", funct
 		ppl: 0,
 		atsg: 0,
 		atst: 0
-	 };
+	};
 
-	 $scope.newEinheit = angular.extend({}, defaultEinheit);
+	$scope.newEinheit = angular.extend({}, defaultEinheit);
 
-	$scope.calculateSums = function() {
+	$scope.calculateSums = function () {
 		var allSums = {
-			_fws:{},
-			fw:0,
-			fzg:0,
-			ppl:0,
-			atsg:0,
-			atst:0
+			_fws: {},
+			fw: 0,
+			fzg: 0,
+			ppl: 0,
+			atsg: 0,
+			atst: 0
 		};
 		var actSums = {
-			_fws:{},
-			fw:0,
-			fzg:0,
-			ppl:0,
-			atsg:0,
-			atst:0
+			_fws: {},
+			fw: 0,
+			fzg: 0,
+			ppl: 0,
+			atsg: 0,
+			atst: 0
 		};
 
 		for (k in $scope.ElfData.ek) {
@@ -357,16 +362,16 @@ app.controller("ElfKraefteController", ["$scope", "$rootScope", "ElfData", funct
 	};
 
 	$scope.calculateSums();
-	$rootScope.$on("ek",function(){
+	$rootScope.$on("ek", function () {
 		$scope.calculateSums();
 	});
 
-	$scope.einheitLeaves = function(e) {
-		var newE = angular.extend({}, e, {to:new Date()});
+	$scope.einheitLeaves = function (e) {
+		var newE = angular.extend({}, e, { to: new Date() });
 		$scope.ElfData.updateEkEntry(newE);
 	};
 
-	$scope.addEinheit = function() {
+	$scope.addEinheit = function () {
 		if (($scope.newEinheit.fw === undefined) || ($scope.newEinheit.fw === "")) {
 			alert("Feuerwehr muss ausgefüllt sein!");
 			document.getElementById('newEinheitFw').focus();
@@ -404,18 +409,59 @@ app.controller("ElfKraefteController", ["$scope", "$rootScope", "ElfData", funct
 	};
 }]);
 
+app.controller("ElfDruckenController", ["$timeout", "$compile", "$scope", "$rootScope", "$http", "ElfData", function ($timeout, $compile, $scope, $rootScope, $http, ElfData) {
+	$scope.ElfData = ElfData;
+	$scope.ElfData.mode = 3;
+	
+	$scope.allSums = {};
+	$scope.actSums = {};	
+	$scope.printEtb = true;
+	$scope.printEk = true;
+
+	var printElement = function (elem) {
+		//var domClone = elem.cloneNode(true);
+		var domClone = elem[0];
+		var $printSection = document.getElementById("printSection");
+		if (!$printSection) {
+			var $printSection = document.createElement("div");
+			$printSection.id = "printSection";
+			document.body.appendChild($printSection);
+		}
+		$printSection.innerHTML = "";
+		$printSection.appendChild(domClone);
+	}
+
+	$scope.print = function () {
+		$http.get("app/print/print.html").success(function (template) {
+			var printScope = angular.extend($rootScope.$new(), {printEtb: $scope.printEtb, printEk: $scope.printEk, ElfData: $scope.ElfData, allSums: $scope.allSums, actSums: $scope.actSums});
+			var compiledPrint = $compile($('<div>' + template + '</div>'));
+			var element = compiledPrint(printScope);
+			var waitForRenderAndPrint = function () {
+				if (printScope.$$phase || $http.pendingRequests.length) {
+					$timeout(waitForRenderAndPrint);
+				} else {
+					printElement(element);
+					window.print();
+					printScope.$destroy();
+				}
+			}
+			waitForRenderAndPrint();
+		});
+	};
+}]);
+
 
 /* Filters */
-app.filter('orderObjectBy', function() {
-	return function(items, field, reverse) {
+app.filter('orderObjectBy', function () {
+	return function (items, field, reverse) {
 		var filtered = [];
-		angular.forEach(items, function(item) {
+		angular.forEach(items, function (item) {
 			filtered.push(item);
 		});
 		filtered.sort(function (a, b) {
 			return (a[field] > b[field] ? 1 : -1);
 		});
-		if(reverse) filtered.reverse();
+		if (reverse) filtered.reverse();
 		return filtered;
 	};
 });

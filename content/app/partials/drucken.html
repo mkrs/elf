@@ -1,0 +1,12 @@
+<!-- Drucken -->
+<section id="drucken" class="container-fluid">
+	<h1>Drucken</h1>
+   <p>Zu druckende Einsatzaufzeichnungen ausw&auml;hlen:</p>
+   <div class="checkbox">
+      <label><input type="checkbox" ng-model="printEtb">Einsatztagebuch</label>
+   </div>
+   <div class="checkbox">
+      <label><input type="checkbox" ng-model="printEk">Eingesetzte Kr&auml;fte</label>
+   </div>
+   <button ng-click="print()" class="btn btn-success">Drucken</button>
+</section>

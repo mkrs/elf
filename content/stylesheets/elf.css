@@ -110,4 +110,14 @@ footer.footer {
     left: 0;
     top: 0;
   }
+  
+  table {
+    font-size: 8pt;
+  }
+  table tr td, table tr th {
+    page-break-inside: avoid;
+  }
+  section {
+    page-break-after: always;
+  }
 }

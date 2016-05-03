@@ -1,16 +1,16 @@
 <header>
 	<div class="container-fluid">
-		<div class="col-md-4">
-			<h1>Einsatztagebuch</h1>
-		</div>
-		<div class="col-md-8">
-			<h1>{{einsatz}}</h1>
+		<div class="row">
+			<div class="col-md-12">
+				<h1>{{ElfData.einsatz}}</h1>
+			</div>
 		</div>
 	</div>
-	
 </header>
 
-<section>
+<section ng-if="printEtb===true">
+	<h2>Einsatztagebuch</h2>
+			
 	<table class="table table-condensed table-bordered">
 		<thead>
 			<tr>
@@ -22,7 +22,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr ng-repeat="e in etb | orderObjectBy:'ts':true">
+			<tr ng-repeat="e in ElfData.etb | orderObjectBy:'ts':true">
 				<td>{{ e.ts | date:"dd.MM.yyyy HH:mm" }}</td>
 				<td ng-hide="e.edit">{{ e.to }}</td>
 				<td ng-show="e.edit"><input class="form-control" ng-model="e.to" type="text" placeholder="An"></td>
@@ -36,3 +36,94 @@
 		</tbody>
 	</table>
 </section>
+
+<section ng-if="printEk===true">
+	<h2>Eingesetzte Kr&auml;fte</h2>
+	
+	<div class="row">
+		<div class="col-md-12">
+			<table class="table table-condensed table-bordered">
+				<thead>
+					<th></th>
+					<th>AKTUELL</th>
+					<th>GESAMT</th>
+				</thead>
+				<tbody>
+					<tr>
+						<th>Feuerwehren</th>
+						<td>{{ actSums.fw }}</td>
+						<td>{{ allSums.fw }}</td>
+					</tr>
+					<tr>
+						<th>Fahrzeuge</th>
+						<td>{{ actSums.fzg }}</td>
+						<td>{{ allSums.fzg }}</td>
+					</tr>
+					<tr>
+						<th>Mannschaftsstand</th>
+						<td>{{ actSums.ppl }}</td>
+						<td>{{ allSums.ppl }}</td>
+					</tr>
+					<tr>
+						<th>ATS Ger&auml;te</th>
+						<td>{{ actSums.atsg }}</td>
+						<td>{{ allSums.atsg }}</td>
+					</tr>
+					<tr>
+						<th>ATS Ger&auml;tetr&auml;ger</th>
+						<td>{{ actSums.atst }}</td>
+						<td>{{ allSums.atst }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	
+	<div class="row">		
+		<div class="col-md-12">
+			<table id="kraefte" class="table table-condensed table-bordered">
+				<thead>
+					<tr>
+						<th class="table-min">Kommt</th>
+						<th class="table-min">Geht</th>
+						<th>Feuerwehr</th>
+						<th>Fahrzeug</th>
+						<th class="table-min">Mitglieder</th>
+						<th class="table-min">ATS Geräte</th>
+						<th class="table-min">ATS Träger</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="k in ElfData.ek | orderObjectBy:'from':true" ng-if="k.to===null">
+						<td class="table-min">{{ k.from | date:"dd.MM.yyyy HH:mm" }}</td>
+						<td class="table-min"></td>
+						<td>{{ k.fw }}</td>
+						<td>{{ k.fzg }}</td>
+						<td>{{ k.ppl }}</td>
+						<td>{{ k.atsg }}</td>
+						<td>{{ k.atst }}</td>
+					</tr>
+					<tr ng-repeat="k in ElfData.ek | orderObjectBy:'from':true" ng-if="k.to!==null">
+						<td class="table-min">{{ k.from | date:"dd.MM.yyyy HH:mm" }}</td>
+						<td class="table-min">{{ k.to | date:"dd.MM.yyyy HH:mm" }}</td>
+						<td>{{ k.fw }}</td>
+						<td>{{ k.fzg }}</td>
+						<td>{{ k.ppl }}</td>
+						<td>{{ k.atsg }}</td>
+						<td>{{ k.atst }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</section>
+
+<footer>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-6">
+				Freiwillige Feuerwehr Zellerndorf
+			</div>
+		</div>
+	</div>
+</footer>
