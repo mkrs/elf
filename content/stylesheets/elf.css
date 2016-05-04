@@ -88,6 +88,7 @@ footer.footer {
 @media print {
   @page {
     size: landscape;
+    margin: 1cm;
   }
 
   thead {
@@ -98,6 +99,14 @@ footer.footer {
   body * {
     visibility: hidden;
   }
+  
+  /*section#content {
+    display:none;
+  }
+  
+  nav {
+    display:none;
+  }*/
 
   /* line 82, ../sass/elf.scss */
   #printSection, #printSection * {
@@ -105,10 +114,17 @@ footer.footer {
   }
 
   /* line 85, ../sass/elf.scss */
-  #printSection {
+  /*#printSection {
     position: absolute;
     left: 0;
     top: 0;
+  }*/
+  
+  h1 {
+    font-size: 14pt;
+  }
+  h2 {
+    font-size: 12pt;
   }
   
   table {

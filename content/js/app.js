@@ -411,12 +411,56 @@ app.controller("ElfKraefteController", ["$scope", "$rootScope", "ElfData", funct
 
 app.controller("ElfDruckenController", ["$timeout", "$compile", "$scope", "$rootScope", "$http", "ElfData", function ($timeout, $compile, $scope, $rootScope, $http, ElfData) {
 	$scope.ElfData = ElfData;
-	$scope.ElfData.mode = 3;
+	$scope.ElfData.mode = 9;
 	
 	$scope.allSums = {};
 	$scope.actSums = {};	
 	$scope.printEtb = true;
 	$scope.printEk = true;
+
+	$scope.calculateSums = function () {
+		var allSums = {
+			_fws: {},
+			fw: 0,
+			fzg: 0,
+			ppl: 0,
+			atsg: 0,
+			atst: 0
+		};
+		var actSums = {
+			_fws: {},
+			fw: 0,
+			fzg: 0,
+			ppl: 0,
+			atsg: 0,
+			atst: 0
+		};
+
+		for (k in $scope.ElfData.ek) {
+			var item = $scope.ElfData.ek[k];
+
+			allSums._fws[item.fw] = true;
+			allSums.fzg += 1;
+			allSums.ppl += item.ppl;
+			allSums.atsg += item.atsg;
+			allSums.atst += item.atst;
+
+			if (item.to === null) {
+				actSums._fws[item.fw] = true;
+				actSums.fzg += 1;
+				actSums.ppl += item.ppl;
+				actSums.atsg += item.atsg;
+				actSums.atst += item.atst;
+			}
+		}
+
+		allSums.fw = Object.keys(allSums._fws).length;
+		actSums.fw = Object.keys(actSums._fws).length;
+		$scope.allSums = allSums;
+		$scope.actSums = actSums;
+	};
+
+	$scope.calculateSums();
 
 	var printElement = function (elem) {
 		//var domClone = elem.cloneNode(true);
@@ -433,7 +477,7 @@ app.controller("ElfDruckenController", ["$timeout", "$compile", "$scope", "$root
 
 	$scope.print = function () {
 		$http.get("app/print/print.html").success(function (template) {
-			var printScope = angular.extend($rootScope.$new(), {printEtb: $scope.printEtb, printEk: $scope.printEk, ElfData: $scope.ElfData, allSums: $scope.allSums, actSums: $scope.actSums});
+			var printScope = angular.extend($rootScope.$new(), {bPrintMode: true, printEtb: $scope.printEtb, printEk: $scope.printEk, ElfData: $scope.ElfData, allSums: $scope.allSums, actSums: $scope.actSums});
 			var compiledPrint = $compile($('<div>' + template + '</div>'));
 			var element = compiledPrint(printScope);
 			var waitForRenderAndPrint = function () {

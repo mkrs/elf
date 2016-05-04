@@ -23,7 +23,7 @@
 </head>
 <body>
 <!-- Navigation -->
-<nav class="navbar navbar-default navbar-fixed-top">
+<nav class="navbar navbar-default navbar-fixed-top" ng-if="bPrintMode===undefined">
 	<div class="container-fluid">
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#nav-collapse">
@@ -56,7 +56,7 @@
 <!-- /Navigation -->
 
 <!-- Content -->
-<div id="content" class="ng-view"></div>
+<div id="content" class="ng-view" ng-if="bPrintMode===undefined"></div>
 <!-- /Content -->
 </body>
 </html>
