@@ -96,22 +96,22 @@ footer.footer {
   }
 
   /* line 79, ../sass/elf.scss */
-  body * {
+  /*body * {
     visibility: hidden;
-  }
+  }*/
   
-  /*section#content {
+  section#content {
     display:none;
   }
   
   nav {
     display:none;
-  }*/
+  }
 
   /* line 82, ../sass/elf.scss */
-  #printSection, #printSection * {
+  /*#printSection, #printSection * {
     visibility: visible;
-  }
+  }*/
 
   /* line 85, ../sass/elf.scss */
   /*#printSection {
@@ -135,5 +135,8 @@ footer.footer {
   }
   section {
     page-break-after: always;
+  }
+  section:first, section:last {
+    page-break-after: avoid !important;
   }
 }
